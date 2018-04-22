@@ -1,6 +1,7 @@
 package texteditor;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Arrays;
 
 import javafx.fxml.FXML;
@@ -29,7 +30,7 @@ public class AppController {
 			if(openFile.isOk() && openFile.hasData()) {
 				 textFile = openFile.getData();
 				 textArea.clear();
-				 textFile.getContent().forEach(textArea::appendText);
+				 textFile.getContent().forEach(line -> textArea.appendText(line + "\n"));
 			} else {
 				// Show dialog box
 				System.out.println(openFile.getError());
@@ -39,8 +40,21 @@ public class AppController {
 	
 	@FXML
 	private void onSave() {
-		TextFile newTextFile = new TextFile(textFile.getFilePath(), Arrays.asList(textArea.getText().split("\n")));
-		model.save(newTextFile); 
+		if(textFile != null) {
+			saveFile(textFile.getFilePath());
+		} else {
+			onSaveAs();
+		}
+	}
+	
+	@FXML
+	private void onSaveAs() {
+		FileChooser fileChooser = new FileChooser();
+		fileChooser.setInitialDirectory(new File("./"));
+		File file = fileChooser.showSaveDialog(null);
+		if(file != null) {
+			saveFile(file.toPath());
+		}
 	}
 	
 	@FXML
@@ -55,10 +69,16 @@ public class AppController {
 	
 	@FXML
 	private void onAbout() {
-		Alert about = new Alert(Alert.AlertType.INFORMATION);
-		about.setHeaderText("Ambiguous");
+		Alert about = new Alert(AlertType.INFORMATION);
+		about.setHeaderText("COMP90020: Distributed Algorithms");
 		about.setTitle("About");
-		about.setContentText("COMP90020: Text Editor implementing Conflict Free Replicated Data Types\nVersion: 1.0.0");
+		about.setContentText("Text Editor implementing Conflict Free Replicated Data Types\nVersion: 1.0.0");
 		about.show();
+	}
+	
+	private void saveFile(Path filePath) {
+		TextFile newTextFile = new TextFile(filePath, Arrays.asList(textArea.getText().split("\n")));
+		model.save(newTextFile);
+		textFile = newTextFile;
 	}
 }
