@@ -3,16 +3,25 @@ package texteditor;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.List;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.TextArea;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Label;
 import javafx.stage.FileChooser;
 
 public class AppController {
 	@FXML
 	private TextArea textArea;
+	@FXML
+	private Label fileName;
+	@FXML
+	private Label wordCount;
+	
 	private TextFile textFile;
 	private AppModel model;
 	
@@ -74,6 +83,15 @@ public class AppController {
 		about.setTitle("About");
 		about.setContentText("Text Editor implementing Conflict Free Replicated Data Types\nVersion: 1.0.0");
 		about.show();
+	}
+	
+	@FXML
+	private void onKeyPressed(KeyEvent e) {
+		if(e.getCode().equals(KeyCode.SPACE) || e.getCode().equals(KeyCode.ENTER)) {
+			List<String> words = Arrays.asList(textArea.getText().split("\\s")); 
+			System.out.println(words);
+			wordCount.setText("Word Count: " + words.size());
+		}
 	}
 	
 	private void saveFile(Path filePath) {

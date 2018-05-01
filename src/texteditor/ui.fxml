@@ -5,35 +5,45 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.control.MenuItem?>
 
-
-<BorderPane prefHeight="600.0" prefWidth="800.0" 
-	xmlns="http://javafx.com/javafx/8" 
-	xmlns:fx="http://javafx.com/fxml/1"
-	fx:controller="texteditor.AppController">
+<BorderPane prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="texteditor.AppController">
 	
    <top>
       <MenuBar BorderPane.alignment="CENTER">
-          <Menu text="File">
-          	<MenuItem text="Open" onAction="#onOpen" />
-          	<MenuItem text="Save" onAction="#onSave" />
-          	<MenuItem text="SaveAs" onAction="#onSaveAs" />
-            <MenuItem text="Exit" onAction="#onExit" />
-          </Menu>
-          <Menu text="Edit">
-          	<MenuItem text="Delete" onAction="#onDelete" />
-          </Menu>
-          <Menu text="Help">
-          	<MenuItem text="About" onAction="#onAbout" />
-          </Menu>
+         <menus>
+             <Menu text="File">
+                <items>
+                	<MenuItem onAction="#onOpen" text="Open" />
+                	<MenuItem onAction="#onSave" text="Save" />
+                	<MenuItem onAction="#onSaveAs" text="SaveAs" />
+                  <MenuItem onAction="#onExit" text="Exit" />
+                </items>
+             </Menu>
+             <Menu text="Edit">
+                <items>
+                	<MenuItem onAction="#onDelete" text="Delete" />
+                </items>
+             </Menu>
+             <Menu text="Help">
+                <items>
+                	<MenuItem onAction="#onAbout" text="About" />
+                </items>
+             </Menu>
+         </menus>
       </MenuBar>
    </top>
    
    <bottom>
-      <HBox prefHeight="40.0" prefWidth="600.0" BorderPane.alignment="CENTER" />
+      <HBox prefHeight="40.0" prefWidth="600.0" BorderPane.alignment="CENTER">
+         <children>
+            <Label fx:id="fileName" text="New File" />
+            <Region prefHeight="40.0" prefWidth="20.0" />
+            <Label fx:id="wordCount" text="Word Count: 0" />
+         </children></HBox>
    </bottom>
    
    <center>
-      <TextArea fx:id="textArea" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
+      <TextArea fx:id="textArea" onKeyPressed="#onKeyPressed" 
+      	prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
    </center>
    
 </BorderPane>
