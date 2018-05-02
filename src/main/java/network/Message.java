@@ -3,6 +3,7 @@ package network;
 import crdt.Operation;
 
 import java.io.*;
+import java.util.Objects;
 import java.util.UUID;
 
 public class Message implements Serializable {
@@ -69,4 +70,14 @@ public class Message implements Serializable {
     public void setOperation(Operation operation) {
         this.operation = operation;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Message message = (Message) o;
+        return Objects.equals(getMemberId(), message.getMemberId()) &&
+                Objects.equals(getOperation(), message.getOperation());
+    }
+
 }
