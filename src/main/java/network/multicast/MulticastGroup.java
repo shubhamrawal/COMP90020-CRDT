@@ -1,28 +1,26 @@
 package network.multicast;
 
-import crdt.Operation;
-import network.Callback;
-import network.Group;
-import network.Message;
+import network.message.Callback;
+import network.message.Group;
+import network.message.Message;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
-import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.logging.Logger;
 
-public class MulticastGroup implements Group {
+public class MulticastGroup implements Group<Message> {
 
     private static final Logger LOGGER = Logger.getLogger(Thread.currentThread().getStackTrace()[0].getClassName() );
     private String multicastHost;
     private int multicastPort;
     private InetAddress receiveInetAddress;
     private MulticastSocket receiveMulticastSocket;
-    private Callback callback;
+    private Callback<Message> callback;
     private ExecutorService service = Executors.newFixedThreadPool(1);
     private Future future;
 
@@ -32,17 +30,15 @@ public class MulticastGroup implements Group {
         this.multicastPort = multicastPort;
     }
 
-    public void send(UUID memberId, Operation operation) {
-        // TODO increment vector timestamp
-        // TODO add timestamp to message
+    public void send(Message message) {
         try {
-            sendMulticast(Message.serialize(new Message(memberId, operation)));
+            sendMulticast(Message.serialize(message));
         } catch (IOException e) {
             LOGGER.severe("Message could not be serialized and therefore not sent");
         }
     }
 
-    public void onReceipt(Callback callback) {
+    public void onReceipt(Callback<Message> callback) {
         this.callback = callback;
     }
 
@@ -81,7 +77,7 @@ public class MulticastGroup implements Group {
         try {
             Message message = Message.deserialize(data);
             if (callback != null) {
-                callback.merge(message.getMemberId(), message.getOperation());
+                callback.process(message);
             }
         } catch (IOException e) {
             LOGGER.warning("Received data could not be turned into valid message object");

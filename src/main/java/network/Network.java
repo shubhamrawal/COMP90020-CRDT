@@ -1,6 +1,7 @@
 package network;
 
 import network.multicast.MulticastGroup;
+import network.ordering.OrderedGroup;
 
 public class Network {
 
@@ -16,8 +17,7 @@ public class Network {
         return Network.network;
     }
 
-    public Group create(String multicastAddress, int multicastPort) {
-        Group group = new MulticastGroup(multicastAddress, multicastPort);
-        return group;
+    public CRDTGroup create(String multicastAddress, int multicastPort) {
+        return new CRDTGroup(new OrderedGroup(new MulticastGroup(multicastAddress, multicastPort)));
     }
 }
