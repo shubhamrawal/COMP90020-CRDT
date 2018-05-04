@@ -1,8 +1,8 @@
-package network.multicast;
+package messenger.multicast;
 
-import network.message.Callback;
-import network.message.Group;
-import network.message.Message;
+import messenger.message.Callback;
+import messenger.message.Group;
+import messenger.message.Message;
 
 import java.io.IOException;
 import java.net.DatagramPacket;

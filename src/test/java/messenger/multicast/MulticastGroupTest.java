@@ -1,9 +1,9 @@
-package network.multicast;
+package messenger.multicast;
 
 import crdt.Operation;
-import network.CRDTMessage;
-import network.message.Callback;
-import network.message.Message;
+import messenger.CRDTMessage;
+import messenger.message.Callback;
+import messenger.message.Message;
 import org.junit.Test;
 
 import java.util.UUID;

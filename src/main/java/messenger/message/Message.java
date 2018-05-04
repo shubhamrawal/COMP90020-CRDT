@@ -1,4 +1,4 @@
-package network.message;
+package messenger.message;
 
 import java.io.*;
 

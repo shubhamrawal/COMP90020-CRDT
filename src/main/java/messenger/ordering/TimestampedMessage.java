@@ -1,6 +1,6 @@
-package network.ordering;
+package messenger.ordering;
 
-import network.message.Message;
+import messenger.message.Message;
 
 public class TimestampedMessage implements Message {
 

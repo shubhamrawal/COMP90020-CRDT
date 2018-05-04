@@ -1,8 +1,8 @@
-package network;
+package messenger;
 
 import crdt.Operation;
-import network.message.Group;
-import network.message.Message;
+import messenger.message.Group;
+import messenger.message.Message;
 
 import java.util.UUID;
 

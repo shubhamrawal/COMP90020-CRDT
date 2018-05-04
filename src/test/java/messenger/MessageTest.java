@@ -1,7 +1,7 @@
-package network;
+package messenger;
 
 import crdt.Operation;
-import network.message.Message;
+import messenger.message.Message;
 import org.junit.Assert;
 import org.junit.Test;
 

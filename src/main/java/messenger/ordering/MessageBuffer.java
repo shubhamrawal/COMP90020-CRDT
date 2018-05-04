@@ -1,4 +1,4 @@
-package network.ordering;
+package messenger.ordering;
 
 public class MessageBuffer {
 

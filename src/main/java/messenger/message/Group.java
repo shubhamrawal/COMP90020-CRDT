@@ -1,4 +1,4 @@
-package network.message;
+package messenger.message;
 
 public interface Group<M extends Message> {
 

@@ -1,7 +1,7 @@
-package network;
+package messenger;
 
-import network.multicast.MulticastGroup;
-import network.ordering.OrderedGroup;
+import messenger.multicast.MulticastGroup;
+import messenger.ordering.OrderedGroup;
 
 public class Network {
 

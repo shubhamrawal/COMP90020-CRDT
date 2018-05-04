@@ -1,8 +1,8 @@
-package network.ordering;
+package messenger.ordering;
 
-import network.message.Callback;
-import network.message.Group;
-import network.message.Message;
+import messenger.message.Callback;
+import messenger.message.Group;
+import messenger.message.Message;
 
 public class OrderedGroup implements Group<Message> {
 

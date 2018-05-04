@@ -1,4 +1,4 @@
-package network.ordering;
+package messenger.ordering;
 
 import java.io.Serializable;
 

@@ -1,8 +1,8 @@
-package network;
+package messenger;
 
 import crdt.Operation;
-import network.message.Callback;
-import network.message.Message;
+import messenger.message.Callback;
+import messenger.message.Message;
 
 import java.util.UUID;
 
