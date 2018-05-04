@@ -22,11 +22,11 @@ public class Test {
 		UUID udis = UUID.randomUUID();
 		byte zero = 0;
 		byte one = 1;
-		Position x = new Position(new byte[] {1}, one, udis);
-		Position y = new Position(new byte[] {1, 1}, one, udis);
+//		Position x = new Position(new byte[] {1}, one, udis);
+//		Position y = new Position(new byte[] {1, 1}, one, udis);
 //		Position z = generatePosId(x, y, udis);
 //		System.out.println(z.getFullPath());
-		System.out.println(x.lessThan(y));
+//		System.out.println(x.lessThan(y));
 	}
 
 }

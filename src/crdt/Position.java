@@ -5,18 +5,25 @@ import java.util.UUID;
 public class Position {
 //	private String path;
 //	private String node;
-	private byte[] path;
-	private byte node;
+	private Byte[] path;
+	private Byte node;
 	private UUID udis;
 	
-	public Position(byte[] path, byte node, UUID udis) {
+	public Position(Byte[] path, Byte node, UUID udis) {
 		this.path = path;
 		this.node = node;
 		this.udis = udis;
 	}
 	
 	public boolean lessThan(Position x) {
-		byte[] xPath = x.getPath();
+		if(x.isRoot()) {
+			if(node == 1) {
+				return true;
+			} else {
+				return false;
+			}
+		}
+		Byte[] xPath = x.getPath();
 		int minLength = Math.min(path.length, xPath.length);
 		for(int i = 0; i < minLength; i++) {
 			if(path[i] < xPath[i]) {
@@ -28,7 +35,11 @@ public class Position {
 			}
 		}
 		
-		return this.node < x.getNode();
+//		return this.node < x.getNode();
+		if(x.getNode() == 1) {
+			return true;
+		} 
+		return false;
 	}
 	
 //	public boolean lessThan(Position x) {
@@ -67,11 +78,11 @@ public class Position {
 		return (!lessThan(x) && !equalTo(x));
 	}
 	
-	public byte[] getPath() {
+	public Byte[] getPath() {
 		return path;
 	}
 	
-	public byte getNode() {
+	public Byte getNode() {
 		return node;
 	}
 	
@@ -84,16 +95,16 @@ public class Position {
 		return "[" + path + "(" + node + " : d)]";
 	}
 	
-//	public boolean isAncestorOf(Position x) {
-//		if(x.isRoot()) {
-//			return false;
-//		}
-//		if(isParentOf(x)) {
-//			return true;
-//		} else {
-//			return isAncestorOf(getParent(x));
-//		}
-//	}
+	public boolean isAncestorOf(Position x) {
+		if(x.isRoot()) {
+			return false;
+		}
+		if(isParentOf(x)) {
+			return true;
+		} else {
+			return isAncestorOf(getParent(x));
+		}
+	}
 	
 //	private boolean isRoot() {
 //		return (path + node).equals("");
@@ -108,6 +119,35 @@ public class Position {
 //		int len = x.getPath().length();
 //		return new Position(xPath.substring(0, len-2), xPath.substring(len-2, len-1), x.getUDIS());
 //	}
+	
+	private boolean isRoot() {
+		return (path == null && node == null);
+	}
+	
+	private boolean isParentOf(Position x) {
+		Byte[] xPath = x.getPath();
+		if(path.length+1 != xPath.length) {
+			return false;
+		}
+		for(int i = 0; i < path.length; i++) {
+			if(path[i] != xPath[i]) {
+				return false;
+			}
+		}
+		if(node != xPath[xPath.length-1]) {
+			return false;
+		}
+		return true;
+	}
+	
+	private Position getParent(Position x) {
+		Byte[] xPath = x.getPath();
+		Byte[] parentPath = new Byte[xPath.length-1];
+		for(int i = 0; i < parentPath.length; i++) {
+			parentPath[i] = xPath[i];
+		}
+		return new Position(parentPath, xPath[xPath.length-1], x.getUDIS());
+	}
 	
 	private boolean checkCommonPrefix(String a, String b) {
 		int minLength = Math.min(a.length(), b.length());
