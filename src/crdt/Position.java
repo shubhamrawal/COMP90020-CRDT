@@ -46,12 +46,38 @@ public class Position {
 		return node;
 	}
 	
-	public String getUDIS() {
-		return udis.toString();
+	public UUID getUDIS() {
+		return udis;
 	}
 	
 	public String getFullPath() {
-		return "[" + path + "(" + node + " : " + udis.toString() + ")]";
+//		return "[" + path + "(" + node + " : " + udis.toString() + ")]";
+		return "[" + path + "(" + node + " : d)]";
+	}
+	
+	public boolean isAncestorOf(Position x) {
+		if(x.isRoot()) {
+			return false;
+		}
+		if(isParentOf(x)) {
+			return true;
+		} else {
+			return isAncestorOf(getParent(x));
+		}
+	}
+	
+	private boolean isRoot() {
+		return (path + node).equals("");
+	}
+	
+	private boolean isParentOf(Position x) {
+		return (this.path + this.node).equals(x.getPath());
+	}
+	
+	private Position getParent(Position x) {
+		String xPath = x.getPath();
+		int len = x.getPath().length();
+		return new Position(xPath.substring(0, len-2), xPath.substring(len-2, len-1), x.getUDIS());
 	}
 	
 	private boolean checkCommonPrefix(String a, String b) {

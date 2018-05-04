@@ -49,7 +49,7 @@ public class BinaryTree {
 		if(left != null) {
 			string(left);
 		}
-		System.out.println(current.toString());
+		System.out.println(current.toString() + " - " + current.getPosId().getFullPath());
 		if(right != null) {
 			string(right);
 		}

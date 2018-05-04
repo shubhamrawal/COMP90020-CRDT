@@ -42,18 +42,9 @@ public class AppModel {
 	public void insert(String ch, int position) {
 		Atom a = new Atom(ch);
 		tree.insert(position, a);
-		list.add(position, a);
-		if(position-1 >= 0) {
-			System.out.println(list.get(position-1).toString());
-		}
-		if(position+1 < list.size()) {
-			System.out.println(list.get(position+1).toString());
-		}
 	}
 	
 	public void print() {
-		for(Atom a : list) {
-			System.out.println(a.toString());
-		}
+		tree.printString();
 	}
 }
