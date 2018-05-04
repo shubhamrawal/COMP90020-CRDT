@@ -3,46 +3,75 @@ package crdt;
 import java.util.UUID;
 
 public class Position {
-	private String path;
-	private String node;
+//	private String path;
+//	private String node;
+	private byte[] path;
+	private byte node;
 	private UUID udis;
 	
-	public Position(String path, String node, UUID udis) {
+	public Position(byte[] path, byte node, UUID udis) {
 		this.path = path;
 		this.node = node;
 		this.udis = udis;
 	}
 	
 	public boolean lessThan(Position x) {
-		if(this.path.startsWith(x.getPath()) && x.getNode().equals("1")) {
-			return true;
-		}
-		if(x.getPath().startsWith(this.path) && this.node.equals("0")) {
-			return true;
-		}
-		if(checkCommonPrefix(this.path + this.node, x.getPath() + x.getNode())) {
-			return true;
+		byte[] xPath = x.getPath();
+		int minLength = Math.min(path.length, xPath.length);
+		for(int i = 0; i < minLength; i++) {
+			if(path[i] < xPath[i]) {
+				return true;
+			} else if(path[i] > xPath[i]) {
+				return false;
+			} else {
+				continue;
+			}
 		}
 		
-		return false;
+		return this.node < x.getNode();
 	}
 	
+//	public boolean lessThan(Position x) {
+//		if(this.path.startsWith(x.getPath()) && x.getNode().equals("1")) {
+//			return true;
+//		}
+//		if(x.getPath().startsWith(this.path) && this.node.equals("0")) {
+//			return true;
+//		}
+//		if(checkCommonPrefix(this.path + this.node, x.getPath() + x.getNode())) {
+//			return true;
+//		}
+//		
+//		return false;
+//	}
+	
 	public boolean equalTo(Position x) {
-		if(this.path.equals(x.getPath()) && this.node.equals(x.getNode())) {
-			return true;
+//		if(this.path.equals(x.getPath()) && this.node.equals(x.getNode())) {
+//			return true;
+//		}
+//		return false;
+		
+		if(this.path.length != x.getPath().length) {
+			return false;
 		}
-		return false;
+		for(int i = 0; i < this.path.length; i++) {
+			if(path[i] != x.getPath()[i]) {
+				return false;
+			}
+		}
+		
+		return this.node == x.getNode();
 	}
 	
 	public boolean greaterThan(Position x) {
 		return (!lessThan(x) && !equalTo(x));
 	}
 	
-	public String getPath() {
+	public byte[] getPath() {
 		return path;
 	}
 	
-	public String getNode() {
+	public byte getNode() {
 		return node;
 	}
 	
@@ -55,30 +84,30 @@ public class Position {
 		return "[" + path + "(" + node + " : d)]";
 	}
 	
-	public boolean isAncestorOf(Position x) {
-		if(x.isRoot()) {
-			return false;
-		}
-		if(isParentOf(x)) {
-			return true;
-		} else {
-			return isAncestorOf(getParent(x));
-		}
-	}
+//	public boolean isAncestorOf(Position x) {
+//		if(x.isRoot()) {
+//			return false;
+//		}
+//		if(isParentOf(x)) {
+//			return true;
+//		} else {
+//			return isAncestorOf(getParent(x));
+//		}
+//	}
 	
-	private boolean isRoot() {
-		return (path + node).equals("");
-	}
-	
-	private boolean isParentOf(Position x) {
-		return (this.path + this.node).equals(x.getPath());
-	}
-	
-	private Position getParent(Position x) {
-		String xPath = x.getPath();
-		int len = x.getPath().length();
-		return new Position(xPath.substring(0, len-2), xPath.substring(len-2, len-1), x.getUDIS());
-	}
+//	private boolean isRoot() {
+//		return (path + node).equals("");
+//	}
+//	
+//	private boolean isParentOf(Position x) {
+//		return (this.path + this.node).equals(x.getPath());
+//	}
+//	
+//	private Position getParent(Position x) {
+//		String xPath = x.getPath();
+//		int len = x.getPath().length();
+//		return new Position(xPath.substring(0, len-2), xPath.substring(len-2, len-1), x.getUDIS());
+//	}
 	
 	private boolean checkCommonPrefix(String a, String b) {
 		int minLength = Math.min(a.length(), b.length());

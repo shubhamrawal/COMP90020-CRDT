@@ -20,47 +20,13 @@ public class Test {
 //		
 //		doc.printString();
 		UUID udis = UUID.randomUUID();
-		Position x = new Position("", "1", udis);
-		Position y = new Position("1", "1", udis);
-		Position z = generatePosId(x, y, udis);
-		System.out.println(z.getFullPath());
-	}
-	
-	private static Position generatePosId(Position x, Position y, UUID udis) {
-		if(x == null && y == null) {
-			return new Position("", "", udis);
-		}
-		if(y == null) {
-			if(x.getNode().equals("")) {
-				return new Position("", "1", udis);
-			} else {
-				return new Position(x.getPath() + x.getNode(), "1", udis);
-			}
-		}
-		if(x == null) {
-			if(y.getNode().equals("")) {
-				return new Position("", "0", udis);
-			} else {
-				return new Position(y.getPath() + y.getNode(), "0", udis);
-			}
-		}
-		
-		if(x.isAncestorOf(y)) {
-			return new Position(y.getPath() + y.getNode(), "0", udis);
-		} else if(y.isAncestorOf(x)) {
-			return new Position(x.getPath() + x.getNode(), "1", udis);
-		} else if(areMiniSiblings(x, y)) {
-			return new Position(x.getPath(), "1", udis);
-		} else {
-			return new Position(x.getPath() + x.getNode(), "1", udis);
-		}
-	}
-	
-	private static boolean areMiniSiblings(Position x, Position y) {
-		if((x.getPath() + x.getNode()).equals(y.getPath() + y.getNode())) {
-			return true;
-		}
-		return false;
+		byte zero = 0;
+		byte one = 1;
+		Position x = new Position(new byte[] {1}, one, udis);
+		Position y = new Position(new byte[] {1, 1}, one, udis);
+//		Position z = generatePosId(x, y, udis);
+//		System.out.println(z.getFullPath());
+		System.out.println(x.lessThan(y));
 	}
 
 }

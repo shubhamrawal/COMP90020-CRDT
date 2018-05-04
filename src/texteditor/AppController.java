@@ -3,11 +3,9 @@ package texteditor;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.List;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.TextArea;
-import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
