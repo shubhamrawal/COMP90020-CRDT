@@ -24,7 +24,7 @@ public class TreeReplicatedDocument extends ReplicatedDocument {
 
 		Position posId = generatePosId(x, y);
 		list.add(position, posId);
-		tree.add(posId, new MiniNode(udis, newAtom));
+		tree.add(posId, new MiniNode(newAtom));
 	}
 
 	@Override

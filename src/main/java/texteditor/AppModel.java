@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.util.LinkedList;
 import java.util.List;
 
 import crdt.Atom;
@@ -13,7 +12,6 @@ import crdt.TreeReplicatedDocument;
 public class AppModel {
 	
 	private TreeReplicatedDocument tree = new TreeReplicatedDocument();
-	private LinkedList<Atom> list = new LinkedList<Atom>();
 	
 	public void save(TextFile file) {
 		try {

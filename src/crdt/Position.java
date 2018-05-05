@@ -14,14 +14,17 @@ public class Position {
 	}
 	
 	public boolean lessThan(Position x) {
-		if(this.path.startsWith(x.getPath()) && x.getNode().equals("1")) {
+		String a = this.path + this.node;
+		String b = x.getPath() + x.getNode();
+		if(b.startsWith(a) && b.charAt(a.length()) == '1') {
 			return true;
 		}
-		if(x.getPath().startsWith(this.path) && this.node.equals("0")) {
+		if(a.startsWith(b) && a.charAt(b.length()) == '0') {
 			return true;
 		}
-		if(checkCommonPrefix(this.path + this.node, x.getPath() + x.getNode())) {
-			return true;
+		int index = commonPrefix(a, b);
+		if(index > 0 && index < a.length() && index < b.length()) {
+			return a.charAt(index) < b.charAt(index);
 		}
 		
 		return false;
@@ -51,8 +54,7 @@ public class Position {
 	}
 	
 	public String getFullPath() {
-//		return "[" + path + "(" + node + " : " + udis.toString() + ")]";
-		return "[" + path + "(" + node + " : d)]";
+		return "[" + path + "(" + node + " : " + udis.toString() + ")]";
 	}
 	
 	public boolean isAncestorOf(Position x) {
@@ -77,22 +79,21 @@ public class Position {
 	private Position getParent(Position x) {
 		String xPath = x.getPath();
 		int len = x.getPath().length();
-		return new Position(xPath.substring(0, len-2), xPath.substring(len-2, len-1), x.getUDIS());
+		if(len>1) {
+			return new Position(xPath.substring(0, len-2), xPath.substring(len-2, len-1), x.getUDIS());
+		}
+		return new Position("", "", x.getUDIS());
 	}
 	
-	private boolean checkCommonPrefix(String a, String b) {
+	private int commonPrefix(String a, String b) {
 		int minLength = Math.min(a.length(), b.length());
 		int count = -1;
 		for(int i = 0; i < minLength; i++) {
 			if(a.charAt(i) != b.charAt(i)) {
 				count = i+1;
-				break;
 			}
 		}
-		if(count > 0 && count < minLength) {
-			return a.charAt(count) < b.charAt(count);
-		}
 		
-		return false;
+		return count;
 	}
 }

@@ -1,15 +1,11 @@
 package crdt;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
 public class BinaryTree {
 	Node root = null;
-	HashMap<Position, List<MiniNode>> flat = new HashMap<>();
+//	HashMap<Position, List<MiniNode>> flat = new HashMap<>();
 	
 	public void add(Position posId, MiniNode node) {
-		addToMap(posId, node);
+//		addToMap(posId, node);
 		root = addNode(root, posId, node);
 	}
 	
@@ -17,7 +13,6 @@ public class BinaryTree {
 		if(current == null) {
 			return new Node(posId, node);
 		}
-		
 		if(posId.lessThan(current.getPosId())) {
 			current.setLeft(addNode(current.getLeft(), posId, node));
 		} else if(posId.equalTo(current.getPosId())) {
@@ -29,19 +24,23 @@ public class BinaryTree {
 		return current;
 	}
 	
+	public boolean isEmpty() {
+		return root == null;
+	}
+	
 	public void printString() {
 		string(root);
 	}
 	
-	private void addToMap(Position posId, MiniNode node) {
-		if(flat.containsKey(posId)) {
-			flat.get(posId).add(node);
-		} else {
-			ArrayList<MiniNode> nodes = new ArrayList<MiniNode>();
-			nodes.add(node);
-			flat.put(posId, nodes);
-		}
-	}
+//	private void addToMap(Position posId, MiniNode node) {
+//		if(flat.containsKey(posId)) {
+//			flat.get(posId).add(node);
+//		} else {
+//			ArrayList<MiniNode> nodes = new ArrayList<MiniNode>();
+//			nodes.add(node);
+//			flat.put(posId, nodes);
+//		}
+//	}
 	
 	private void string(Node current) {
 		Node left = current.getLeft();
