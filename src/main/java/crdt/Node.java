@@ -4,12 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Node {
-	private double posId;
+	private Position posId;
 	private List<MiniNode> nodes;
 	private Node left;
 	private Node right;
 	
-	public Node(double posId, MiniNode node) {
+	public Node(Position posId, MiniNode node) {
 		this.posId = posId;
 		nodes = new ArrayList<MiniNode>();
 		nodes.add(node);
@@ -20,7 +20,7 @@ public class Node {
 		return this;
 	}
 	
-	public double getPosId() {
+	public Position getPosId() {
 		return posId;
 	}
 	

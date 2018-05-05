@@ -87,11 +87,15 @@ public class AppController {
 	
 	@FXML
 	private void onKeyPressed(KeyEvent e) {
-		if(e.getCode().equals(KeyCode.SPACE) || e.getCode().equals(KeyCode.ENTER)) {
-			List<String> words = Arrays.asList(textArea.getText().split("\\s")); 
-			System.out.println(words);
-			wordCount.setText("Word Count: " + words.size());
+		if(e.getCode().isDigitKey() || e.getCode().isLetterKey() || e.getCode().isWhitespaceKey()) {
+			int position = textArea.caretPositionProperty().intValue();
+			model.insert(e.getText(), position);
 		}
+	}
+	
+	@FXML
+	private void onPrint() {
+		model.print();
 	}
 	
 	private void saveFile(Path filePath) {

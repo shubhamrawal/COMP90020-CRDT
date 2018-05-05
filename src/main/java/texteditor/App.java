@@ -9,7 +9,7 @@ public class App extends Application {
 
 	@Override
 	public void start(Stage primaryStage) throws Exception {
-		FXMLLoader loader = new FXMLLoader(getClass().getResource("../../../resources/main/ui.fxml"));
+		FXMLLoader loader = new FXMLLoader(getClass().getResource("../ui.fxml"));
 		loader.setControllerFactory(t -> new AppController(new AppModel() ));
 		
 		primaryStage.setScene(new Scene(loader.load()));

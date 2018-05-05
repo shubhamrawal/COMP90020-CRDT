@@ -6,7 +6,12 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.List;
 
+import crdt.Atom;
+import crdt.TreeReplicatedDocument;
+
 public class AppModel {
+	
+	private TreeReplicatedDocument tree = new TreeReplicatedDocument();
 	
 	public void save(TextFile file) {
 		try {
@@ -30,5 +35,14 @@ public class AppModel {
 
 	public void exit() {
 		System.exit(0);
+	}
+	
+	public void insert(String ch, int position) {
+		Atom a = new Atom(ch);
+		tree.insert(position, a);
+	}
+	
+	public void print() {
+		tree.printString();
 	}
 }
