@@ -26,31 +26,59 @@ public class VectorTimestamp implements Serializable {
 	 *  		0 if other timestamp can be delivered
 	 *  		-1 if other timestamp is in the future
 	 */
-	public int compareTo(VectorTimestamp other, UUID sender){
-
-		boolean deliverable = true;
-		boolean past = true;
-
-		for (Entry<UUID, Integer> entry: vectorTs.entrySet()) {
-			if(entry.getValue() < other.getTimestamp(entry.getKey())){
-				past = false;
+//	public int compareTo(VectorTimestamp other, UUID sender){
+//
+//		boolean deliverable = true;
+//		boolean past = true;
+//
+//		for (Entry<UUID, Integer> entry: vectorTs.entrySet()) {
+//			if(entry.getValue() < other.getTimestamp(entry.getKey())){
+//				past = false;
+//			}
+//			if (entry.getKey().equals(sender)) {
+//				if(entry.getValue() + 1 != other.getTimestamp(sender)) {
+//					deliverable = false;
+//				}
+//			} else {
+//				if(entry.getValue() < other.getTimestamp(entry.getKey())){
+//					deliverable = false;
+//				}
+//			}
+//		}
+//		
+//		if (deliverable) {
+//			return 0;
+//		} else {
+//			return past ? 1 : -1;
+//		}
+//	}
+	
+	public boolean isDeliverable(VectorTimestamp other, UUID sender) {
+		int greater = 0;
+		int less = 0;
+		int sent = other.getTimestamp(sender);
+		int seen = vectorTs.get(sender);
+		UUID processID;
+		if (sent == (seen + 1)) {
+			for (Entry<UUID, Integer> entry: vectorTs.entrySet()) {
+				processID = entry.getKey();
+				if (!processID.equals(sender)) {
+					if (other.getTimestamp(processID) > vectorTs.get(processID))
+						greater ++;
+					else if (other.getTimestamp(processID) < vectorTs.get(processID))
+						less ++;
+				}
 			}
-			if (entry.getKey().equals(sender)) {
-				if(entry.getValue() + 1 != other.getTimestamp(sender)) {
-					deliverable = false;
-				}
-			} else {
-				if(entry.getValue() < other.getTimestamp(entry.getKey())){
-					deliverable = false;
-				}
+			// concurrent case
+			if (greater >= 1 && less >= 1) {
+				return true;
+			}
+			// satisfied condition to deliver
+			else if (greater == 0) {
+				return true;
 			}
 		}
-		
-		if (deliverable) {
-			return 0;
-		} else {
-			return past ? 1 : -1;
-		}
+		return false;	
 	}
 	
 	public HashMap<UUID, Integer> getVector() {
