@@ -1,15 +1,17 @@
 package messenger.multicast;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+
+import java.util.UUID;
+
+import org.junit.Test;
+
 import crdt.Operation;
 import messenger.CRDTMessage;
 import messenger.message.Callback;
 import messenger.message.Message;
-import org.junit.Test;
-
-import java.util.UUID;
-
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
+import messenger.multicast.MulticastGroup;
 
 public class MulticastGroupTest {
 

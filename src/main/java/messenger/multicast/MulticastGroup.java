@@ -13,7 +13,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.logging.Logger;
 
-public class MulticastGroup implements Group<Message> {
+public class MulticastGroup implements Group<? extends Message> {
 
     private static final Logger LOGGER = Logger.getLogger(Thread.currentThread().getStackTrace()[0].getClassName() );
     private String multicastHost;
