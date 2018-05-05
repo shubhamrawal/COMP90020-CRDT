@@ -14,7 +14,7 @@ public class OrderedGroup implements Group<Message> {
 	public OrderedGroup(Group<Message> messageGroup) {
 		this.messageGroup = messageGroup;
 		this.timestamp = new VectorTimestamp();
-		this.msgBuf = new MessageBuffer();
+		this.msgBuf = new MessageBuffer(timestamp);
 	}
 
 	public void send(Message message) {
@@ -25,19 +25,29 @@ public class OrderedGroup implements Group<Message> {
 	public void onReceipt(Callback<Message> callback) {
 		this.messageGroup.onReceipt(message -> {
 			
-			int order = this.timestamp.compareTo(message.getTimestamp(), message.getProcessId());
-			if (order == 0) {
+//			int order = this.timestamp.compareTo(message.getTimestamp(), message.getProcessId());
+//			if (order == 0) {
+//				timestamp.merge(message.getTimestamp());
+//				callback.process(message.getInnerMessage());
+//			}
+//			else if(order == -1) {
+//				msgBuf.enqueue(message);
+//			}
+			if(timestamp.isDeliverable(message.getTimestamp(), message.getProcessId())) {
 				timestamp.merge(message.getTimestamp());
 				callback.process(message.getInnerMessage());
 			}
-			else if(order == -1) {
+			else {
 				msgBuf.enqueue(message);
 			}
-			// go through buffer and merge/deliver every message where compareTo == 0
+			
+			if (msgBuf.checkHoldbackQueue() != null) {
+				timestamp.merge(msgBuf.checkHoldbackQueue().getTimestamp());
+				callback.process(msgBuf.checkHoldbackQueue().getInnerMessage());
+			}
 			
 		}
 		);
-
 	}
 
 	public void join() {
