@@ -59,3 +59,7 @@ local.properties
 
 # JavaFX builds
 *.fxbuild
+
+# exclude gradle files
+.gradle/*
+build/*
