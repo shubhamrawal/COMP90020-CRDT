@@ -1,0 +1,21 @@
+group 'unimelb.da.project.crdt'
+version '1.0'
+
+apply plugin: 'application'
+apply plugin: 'java'
+
+sourceCompatibility = 1.8
+
+mainClassName = "texteditor.App"
+
+repositories {
+    mavenCentral()
+    jcenter()
+}
+
+dependencies {
+    // test framework
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    // mocking library
+    testCompile "org.mockito:mockito-core:2.+"
+}

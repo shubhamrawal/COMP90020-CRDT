@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<BorderPane prefHeight="600.0"
+            prefWidth="800.0"
+            xmlns="http://javafx.com/javafx/8"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="texteditor.AppController">
+
+	
+   <top>
+      <MenuBar BorderPane.alignment="CENTER">
+         <menus>
+             <Menu text="File">
+                <items>
+                	<MenuItem onAction="#onOpen" text="Open" />
+                	<MenuItem onAction="#onSave" text="Save" />
+                	<MenuItem onAction="#onSaveAs" text="SaveAs" />
+                  <MenuItem onAction="#onExit" text="Exit" />
+                </items>
+             </Menu>
+             <Menu text="Edit">
+                <items>
+                	<MenuItem onAction="#onDelete" text="Delete" />
+                </items>
+             </Menu>
+             <Menu text="Help">
+                <items>
+                	<MenuItem onAction="#onAbout" text="About" />
+                </items>
+             </Menu>
+         </menus>
+      </MenuBar>
+   </top>
+   
+   <bottom>
+      <HBox prefHeight="40.0" prefWidth="600.0" BorderPane.alignment="CENTER">
+         <children>
+            <Label fx:id="fileName" text="New File" />
+            <Region prefHeight="40.0" prefWidth="20.0" />
+            <Label fx:id="wordCount" text="Word Count: 0" />
+         </children></HBox>
+   </bottom>
+   
+   <center>
+      <TextArea fx:id="textArea" onKeyPressed="#onKeyPressed" 
+      	prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
+   </center>
+   
+</BorderPane>
