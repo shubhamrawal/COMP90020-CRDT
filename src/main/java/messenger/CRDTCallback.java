@@ -11,7 +11,7 @@ public class CRDTCallback implements Callback<CRDTMessage> {
         merge(crdtMessage.getSenderId(), crdtMessage.getOperation());
     }
 
-    private void merge(UUID memberId, Operation operation) {
-        //TODO overwrite and implement merge
+    private void merge(UUID senderId, Operation operation) {
+        //TODO implement merge here
     }
 }

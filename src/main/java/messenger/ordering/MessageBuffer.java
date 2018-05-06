@@ -28,4 +28,8 @@ class MessageBuffer<M extends OrderedMessage> {
 		}
 	}
 
+	int getSize() {
+		return buffer.size();
+	}
+
 }

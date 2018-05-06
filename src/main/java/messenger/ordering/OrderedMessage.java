@@ -2,6 +2,7 @@ package messenger.ordering;
 
 import messenger.message.Message;
 
+import java.util.Objects;
 import java.util.UUID;
 
 public class OrderedMessage<M extends Message> implements Message {
@@ -11,22 +12,32 @@ public class OrderedMessage<M extends Message> implements Message {
     private UUID senderId;
     private M innerMessage;
 
-    public OrderedMessage(UUID senderId, VectorTimestamp timestamp, M innerMessage) {
+    OrderedMessage(UUID senderId, VectorTimestamp timestamp, M innerMessage) {
         this.senderId = senderId;
     	this.timestamp = timestamp;
     	this.innerMessage = innerMessage;
     }
 
-    public UUID getSenderId() {
+    UUID getSenderId() {
     	return senderId;
     }
 
-    public VectorTimestamp getTimestamp() {
+    VectorTimestamp getTimestamp() {
         return timestamp;
     }
 
-	public M getInnerMessage() {
+    M getInnerMessage() {
 		return innerMessage;
 	}
-    
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        OrderedMessage<?> that = (OrderedMessage<?>) o;
+        return Objects.equals(getTimestamp(), that.getTimestamp()) &&
+                Objects.equals(getSenderId(), that.getSenderId()) &&
+                Objects.equals(getInnerMessage(), that.getInnerMessage());
+    }
+
 }
