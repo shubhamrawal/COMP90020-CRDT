@@ -1,36 +1,31 @@
 package messenger.ordering;
 
-import java.util.UUID;
-
 import messenger.message.Message;
 
-public class TimestampedMessage implements Message {
+import java.util.UUID;
+
+public class TimestampedMessage<M extends Message> implements Message {
 	
 	private static final long serialVersionUID = -648298223220854124L;
 	private VectorTimestamp timestamp;
-    private UUID processId;
-    private Message innerMessage;
+    private UUID senderId;
+    private M innerMessage;
 
-    public TimestampedMessage(UUID processId, VectorTimestamp timestamp, Message innerMessage) {
-        this.processId = processId;
+    public TimestampedMessage(UUID senderId, VectorTimestamp timestamp, M innerMessage) {
+        this.senderId = senderId;
     	this.timestamp = timestamp;
     	this.innerMessage = innerMessage;
     }
-    public void setProcessId(UUID pid) {
-    	this.processId = pid;
-    }
-    public UUID getProcessId() {
-    	return processId;
-    }
-    
-    public void setTimestamp(VectorTimestamp ts) {
-    	this.timestamp = ts;
+
+    public UUID getSenderId() {
+    	return senderId;
     }
 
     public VectorTimestamp getTimestamp() {
         return timestamp;
     }
-	public Message getInnerMessage() {
+
+	public M getInnerMessage() {
 		return innerMessage;
 	}
     

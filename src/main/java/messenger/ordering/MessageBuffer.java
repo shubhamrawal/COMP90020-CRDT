@@ -3,35 +3,27 @@ package messenger.ordering;
 import java.util.ArrayList;
 import java.util.UUID;
 
-public class MessageBuffer {
+class MessageBuffer<M extends TimestampedMessage> {
 	
-	private ArrayList<TimestampedMessage> holdBackQueue;
-	private VectorTimestamp vectorTs;
+	private ArrayList<M> holdBackQueue;
 	
-	public MessageBuffer(VectorTimestamp vectorTs) {
-		holdBackQueue = new ArrayList<TimestampedMessage>();
-		this.vectorTs = vectorTs;
+	MessageBuffer() {
+		holdBackQueue = new ArrayList<M>();
 	}
 	
-	public void enqueue(TimestampedMessage msg) {
-		holdBackQueue.add(msg);
+	void enqueue(M message) {
+		holdBackQueue.add(message);
 	}
 	
-	public void dequeue(TimestampedMessage msg) {
-		if (holdBackQueue.contains(msg)) {
-			holdBackQueue.remove(msg);
-		}
-	}
-	
-	public TimestampedMessage checkHoldbackQueue() {
+	M checkHoldbackQueue(VectorTimestamp current) {
 		VectorTimestamp other;
 		UUID sender;
 		int msgIndex;
 		if (!holdBackQueue.isEmpty()) {
 			for (int i = 0; i < holdBackQueue.size(); i++) {
 				other = holdBackQueue.get(i).getTimestamp();
-				sender = holdBackQueue.get(i).getProcessId();
-				if (vectorTs.isDeliverable(other, sender)){
+				sender = holdBackQueue.get(i).getSenderId();
+				if (current.isDeliverable(other, sender)){
 					msgIndex = holdBackQueue.indexOf(holdBackQueue.get(i));
 					return holdBackQueue.remove(msgIndex);
 				}

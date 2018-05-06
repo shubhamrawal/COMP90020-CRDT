@@ -5,49 +5,49 @@ import messenger.message.Group;
 import messenger.message.Message;
 import texteditor.App;
 
-public class OrderedGroup implements Group<Message> {
+public class OrderedGroup<M extends Message> implements Group<M> {
 
-	private Group<TimestampedMessage> messageGroup;
+	private Group<TimestampedMessage<M>> messageGroup;
 	private VectorTimestamp timestamp;
-	private MessageBuffer msgBuf;
+	private MessageBuffer<TimestampedMessage<M>> messageBuffer;
 
-	public OrderedGroup(Group<Message> messageGroup) {
+	public OrderedGroup(Group<TimestampedMessage<M>> messageGroup) {
 		this.messageGroup = messageGroup;
 		this.timestamp = new VectorTimestamp();
-		this.msgBuf = new MessageBuffer(timestamp);
+		this.messageBuffer = new MessageBuffer<TimestampedMessage<M>>();
 	}
 
-	public void send(Message message) {
+	public void send(M message) {
 		this.timestamp.increment(App.uuid);
-		messageGroup.send(new TimestampedMessage(App.uuid, this.timestamp, message));
+		messageGroup.send(new TimestampedMessage<M>(App.uuid, this.timestamp, message));
 	}
 
-	public void onReceipt(Callback<Message> callback) {
+	public void onReceipt(Callback<M> callback) {
 		this.messageGroup.onReceipt(message -> {
 			
-//			int order = this.timestamp.compareTo(message.getTimestamp(), message.getProcessId());
+//			int order = this.timestamp.compareTo(message.getTimestamp(), message.getSenderId());
 //			if (order == 0) {
 //				timestamp.merge(message.getTimestamp());
 //				callback.process(message.getInnerMessage());
 //			}
 //			else if(order == -1) {
-//				msgBuf.enqueue(message);
+//				messageBuffer.enqueue(message);
 //			}
-			if(timestamp.isDeliverable(message.getTimestamp(), message.getProcessId())) {
+			if(timestamp.isDeliverable(message.getTimestamp(), message.getSenderId())) {
 				timestamp.merge(message.getTimestamp());
 				callback.process(message.getInnerMessage());
-			}
-			else {
-				msgBuf.enqueue(message);
+			} else {
+				messageBuffer.enqueue(message);
 			}
 			
-			if (msgBuf.checkHoldbackQueue() != null) {
-				timestamp.merge(msgBuf.checkHoldbackQueue().getTimestamp());
-				callback.process(msgBuf.checkHoldbackQueue().getInnerMessage());
+			while(messageBuffer.checkHoldbackQueue(OrderedGroup.this.timestamp) != null) {
+				timestamp.merge(messageBuffer.checkHoldbackQueue().getTimestamp());
+				callback.process(messageBuffer.checkHoldbackQueue().getInnerMessage());
 			}
 			
 		}
 		);
+
 	}
 
 	public void join() {

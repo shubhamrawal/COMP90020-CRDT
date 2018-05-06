@@ -7,9 +7,6 @@ import java.util.UUID;
 
 public class VectorTimestamp implements Serializable {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 6755210344616768108L;
 	private HashMap<UUID,Integer> vectorTs;
 
