@@ -38,11 +38,15 @@ public class AppModel {
 	}
 	
 	public void insert(String ch, int position) {
-		Atom a = new Atom(ch);
+		Atom a = new Atom(ch.charAt(0));
 		tree.insert(position, a);
 	}
 	
+	public void delete(int position) {
+		tree.delete(position);
+	}
+	
 	public void print() {
-		tree.printString();
+		System.out.println(tree.getTreeString());
 	}
 }

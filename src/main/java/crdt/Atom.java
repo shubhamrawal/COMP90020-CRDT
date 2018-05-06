@@ -2,14 +2,14 @@ package crdt;
 
 public class Atom {
 	
-	private String word;
+	private char character;
 	
-	public Atom(String word) {
-		this.word = word;
+	public Atom(char character) {
+		this.character = character;
 	}
 	
 	public String toString() {
-		return word;
+		return String.valueOf(character);
 	}
 
 }

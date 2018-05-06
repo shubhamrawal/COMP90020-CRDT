@@ -12,7 +12,6 @@ import javafx.stage.FileChooser;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.List;
 
 public class AppController {
 	@FXML
@@ -87,7 +86,13 @@ public class AppController {
 	
 	@FXML
 	private void onKeyPressed(KeyEvent e) {
-		if(e.getCode().isDigitKey() || e.getCode().isLetterKey() || e.getCode().isWhitespaceKey()) {
+		KeyCode code = e.getCode();
+		if(code.equals(KeyCode.BACK_SPACE)) {
+			int position = textArea.caretPositionProperty().intValue();
+			model.delete(position);
+		} else if(!code.isArrowKey() && !code.isFunctionKey() && !code.isMediaKey() 
+				&& !code.isModifierKey() && !code.isNavigationKey() 
+				&& !code.equals(KeyCode.CAPS)) {
 			int position = textArea.caretPositionProperty().intValue();
 			model.insert(e.getText(), position);
 		}

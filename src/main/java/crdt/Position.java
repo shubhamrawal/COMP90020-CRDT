@@ -16,10 +16,10 @@ public class Position {
 	public boolean lessThan(Position x) {
 		String a = this.path + this.node;
 		String b = x.getPath() + x.getNode();
-		if(b.startsWith(a) && b.charAt(a.length()) == '1') {
+		if(a.length() < b.length() && b.startsWith(a) && b.charAt(a.length()) == '1') {
 			return true;
 		}
-		if(a.startsWith(b) && a.charAt(b.length()) == '0') {
+		if(b.length() < a.length() && a.startsWith(b) && a.charAt(b.length()) == '0') {
 			return true;
 		}
 		int index = commonPrefix(a, b);
@@ -30,8 +30,15 @@ public class Position {
 		return false;
 	}
 	
-	public boolean equalTo(Position x) {
+	public boolean equalToNodeId(Position x) {
 		if(this.path.equals(x.getPath()) && this.node.equals(x.getNode())) {
+			return true;
+		}
+		return false;
+	}
+	
+	public boolean equalTo(Position x) {
+		if(equalToNodeId(x) && this.udis.equals(x.getUDIS())) {
 			return true;
 		}
 		return false;

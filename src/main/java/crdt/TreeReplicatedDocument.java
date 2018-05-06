@@ -1,6 +1,7 @@
 package crdt;
 
 import java.util.LinkedList;
+import java.util.List;
 import java.util.UUID;
 
 public class TreeReplicatedDocument extends ReplicatedDocument {
@@ -24,12 +25,25 @@ public class TreeReplicatedDocument extends ReplicatedDocument {
 
 		Position posId = generatePosId(x, y);
 		list.add(position, posId);
-		tree.add(posId, new MiniNode(newAtom));
+		tree.add(new MiniNode(posId, newAtom)); 
 	}
 
 	@Override
 	public void delete(int position) {
+		if(list.size() > 0 && position < list.size()) {
+			Position posId = list.get(position);
+			tree.delete(posId);
+		}
+	}
+	
+	public String getTreeString() {
+		List<String> treeList = tree.getTreeAsList();
+		StringBuilder treeString = new StringBuilder();
+		for(String element : treeList) {
+			treeString.append(element);
+		}
 		
+		return treeString.toString();
 	}
 	
 	public void printString() {

@@ -4,24 +4,36 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Node {
-	private Position posId;
 	private List<MiniNode> nodes;
 	private Node left;
 	private Node right;
 	
-	public Node(Position posId, MiniNode node) {
-		this.posId = posId;
+	public Node(MiniNode node) {
 		nodes = new ArrayList<MiniNode>();
 		nodes.add(node);
 	}
 	
 	public Node addMiniNode(MiniNode node) {
+		// change to account for udis
 		nodes.add(node);
 		return this;
 	}
 	
-	public Position getPosId() {
-		return posId;
+	public void deleteMiniNode(Position posId) {
+		for(MiniNode n : nodes) {
+			if(posId.equalTo(n.getPosId())) {
+				n.delete();
+				break;
+			}
+		}
+	}
+	
+	public List<MiniNode> getMiniNodes() {
+		return nodes;
+	}
+	
+	public Position getNodeId() {
+		return nodes.get(0).getPosId();
 	}
 	
 	public Node getLeft() {
@@ -42,6 +54,12 @@ public class Node {
 	
 	@Override
 	public String toString() {
-		return nodes.toString();
+		StringBuilder strNodes = new StringBuilder();
+		for(MiniNode n : nodes) {
+			if(!n.isTombstone()) {
+				strNodes.append(n.toString());
+			}
+		}
+		return strNodes.toString();
 	}
 }
