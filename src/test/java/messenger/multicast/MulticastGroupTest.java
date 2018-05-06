@@ -15,11 +15,11 @@ public class MulticastGroupTest {
 
     @Test
     public void SentMessageIsReceived() {
-        MulticastGroup group = new MulticastGroup<Message>("224.224.224.2", 9999);
+        MulticastGroup<Message> group = new MulticastGroup<Message>("224.224.224.2", 9999);
         UUID uuid = UUID.fromString("067e6162-3b6f-4ae2-a171-2470b63dff00");
         Operation op = new Operation();
         Message message = new CRDTMessage(uuid, op);
-        Callback callback = mock(Callback.class);
+        Callback<Message> callback = mock(Callback.class);
 
         group.onReceipt(callback);
         group.join();

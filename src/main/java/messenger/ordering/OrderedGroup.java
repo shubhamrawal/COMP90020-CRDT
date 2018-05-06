@@ -7,47 +7,48 @@ import texteditor.App;
 
 public class OrderedGroup<M extends Message> implements Group<M> {
 
-	private Group<TimestampedMessage<M>> messageGroup;
+	private Group<OrderedMessage<M>> messageGroup;
 	private VectorTimestamp timestamp;
-	private MessageBuffer<TimestampedMessage<M>> messageBuffer;
+	private MessageBuffer<OrderedMessage<M>> messageBuffer;
 
-	public OrderedGroup(Group<TimestampedMessage<M>> messageGroup) {
+	public OrderedGroup(Group<OrderedMessage<M>> messageGroup) {
 		this.messageGroup = messageGroup;
 		this.timestamp = new VectorTimestamp();
-		this.messageBuffer = new MessageBuffer<TimestampedMessage<M>>();
+		this.messageBuffer = new MessageBuffer<OrderedMessage<M>>();
 	}
 
 	public void send(M message) {
 		this.timestamp.increment(App.uuid);
-		messageGroup.send(new TimestampedMessage<M>(App.uuid, this.timestamp, message));
+		messageGroup.send(new OrderedMessage<M>(App.uuid, this.timestamp, message));
 	}
 
 	public void onReceipt(Callback<M> callback) {
 		this.messageGroup.onReceipt(message -> {
-			
-//			int order = this.timestamp.compareTo(message.getTimestamp(), message.getSenderId());
-//			if (order == 0) {
-//				timestamp.merge(message.getTimestamp());
-//				callback.process(message.getInnerMessage());
-//			}
-//			else if(order == -1) {
-//				messageBuffer.enqueue(message);
-//			}
-			if(timestamp.isDeliverable(message.getTimestamp(), message.getSenderId())) {
+
+			// first, compare local timestamp with timestamp of received message
+			int order = this.timestamp.compareTo(message.getTimestamp(), message.getSenderId());
+			if (order == 0) {
+				// if received timestamp is expected deliver the message
 				timestamp.merge(message.getTimestamp());
 				callback.process(message.getInnerMessage());
-			} else {
-				messageBuffer.enqueue(message);
 			}
-			
-			while(messageBuffer.checkHoldbackQueue(OrderedGroup.this.timestamp) != null) {
-				timestamp.merge(messageBuffer.checkHoldbackQueue().getTimestamp());
-				callback.process(messageBuffer.checkHoldbackQueue().getInnerMessage());
+			else if(order == -1) {
+				// if received timestamp lies in the future, buffer message
+				messageBuffer.add(message);
 			}
-			
+			// otherwise ignore message as it has already been delivered in the past
+
+			// check the message buffer for deliverable messages and deliver them if possible
+			messageBuffer.applyAndRemoveIfTrue(
+					bufferedMessage -> this.timestamp.compareTo(bufferedMessage.getTimestamp(),
+																	bufferedMessage.getSenderId())
+										== 0,
+					bufferedMessage -> {timestamp.merge(bufferedMessage.getTimestamp());
+										callback.process(bufferedMessage.getInnerMessage());
+										return true;
+					});
 		}
 		);
-
 	}
 
 	public void join() {

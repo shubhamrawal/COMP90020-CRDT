@@ -1,21 +1,20 @@
 package messenger.ordering;
 
+import com.google.common.collect.Maps;
+
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
 
-public class VectorTimestamp implements Serializable {
+class VectorTimestamp implements Serializable {
 
 	private static final long serialVersionUID = 6755210344616768108L;
-	private HashMap<UUID,Integer> vectorTs;
+	private HashMap<UUID,Integer> logicalClocks;
 
-	public VectorTimestamp() {
-		this.vectorTs = new HashMap<UUID,Integer>();
-	}
-	
-	public int getTimestamp(UUID processID) {
-		return vectorTs.get(processID);
+	VectorTimestamp() {
+		this.logicalClocks = new HashMap<UUID,Integer>();
 	}
 
 	/*
@@ -23,86 +22,74 @@ public class VectorTimestamp implements Serializable {
 	 *  		0 if other timestamp can be delivered
 	 *  		-1 if other timestamp is in the future
 	 */
-//	public int compareTo(VectorTimestamp other, UUID sender){
-//
-//		boolean deliverable = true;
-//		boolean past = true;
-//
-//		for (Entry<UUID, Integer> entry: vectorTs.entrySet()) {
-//			if(entry.getValue() < other.getTimestamp(entry.getKey())){
-//				past = false;
-//			}
-//			if (entry.getKey().equals(sender)) {
-//				if(entry.getValue() + 1 != other.getTimestamp(sender)) {
-//					deliverable = false;
-//				}
-//			} else {
-//				if(entry.getValue() < other.getTimestamp(entry.getKey())){
-//					deliverable = false;
-//				}
-//			}
-//		}
-//		
-//		if (deliverable) {
-//			return 0;
-//		} else {
-//			return past ? 1 : -1;
-//		}
-//	}
-	
-	public boolean isDeliverable(VectorTimestamp other, UUID sender) {
-		int greater = 0;
-		int less = 0;
-		int sent = other.getTimestamp(sender);
-		int seen = vectorTs.get(sender);
-		UUID processID;
-		if (sent == (seen + 1)) {
-			for (Entry<UUID, Integer> entry: vectorTs.entrySet()) {
-				processID = entry.getKey();
-				if (!processID.equals(sender)) {
-					if (other.getTimestamp(processID) > vectorTs.get(processID))
-						greater ++;
-					else if (other.getTimestamp(processID) < vectorTs.get(processID))
-						less ++;
+	public int compareTo(VectorTimestamp other, UUID senderId){
+
+		boolean expected = true;
+		boolean past = true;
+
+		for (Entry<UUID, Integer> logicalClock: this.logicalClocks.entrySet()) {
+
+			// we skip over any logical clock that is not contained in the other timestamp
+			if (other.logicalClocks.containsKey(logicalClock.getKey())) {
+				// if any logical clock of the other timestamp is greater than the corresponding local logical clock,
+				// then it cannot be a past timestamp
+				if(logicalClock.getValue() < other.logicalClocks.get(logicalClock.getKey())){
+					past = false;
+				}
+
+				// other timestamp is not expected if either of these conditions hold
+				if (logicalClock.getKey().equals(senderId)) {
+					if(logicalClock.getValue() + 1 != other.logicalClocks.get(senderId)) {
+						expected = false;
+					}
+				} else {
+					if(logicalClock.getValue() < other.logicalClocks.get(logicalClock.getKey())){
+						expected = false;
+					}
 				}
 			}
-			// concurrent case
-			if (greater >= 1 && less >= 1) {
-				return true;
-			}
-			// satisfied condition to deliver
-			else if (greater == 0) {
-				return true;
+		}
+
+		// now we have to deal with logical clocks of the other timestamp that are not part of this one
+		Map<UUID, Integer> unknownLClocks = Maps.difference(this.logicalClocks, other.logicalClocks).entriesOnlyOnRight();
+
+		// if other timestamp contains a logical clock that this one does not
+		for(Entry<UUID, Integer> unknownLClock : unknownLClocks.entrySet()) {
+			// if
+			if(unknownLClock.getKey().equals(senderId)) {
+				// if the unknown logical clock is from the sender
+				if(unknownLClock.getValue() != 1) {
+					// and the logical clock is not 1,
+					// it is a future timestamp and we need to wait for the first timestamp from that sender
+					return -1;
+				}
+			} else {
+				// if the unknown logical clock is not from the sender the timestamp is in the future
+				return -1;
 			}
 		}
-		return false;	
-	}
-	
-	public HashMap<UUID, Integer> getVector() {
-		return vectorTs;
+
+		if (expected) {
+			return 0;
+		} else {
+			return past ? 1 : -1;
+		}
 	}
 
-	public void increment(UUID process) {
-		if (!vectorTs.containsKey(process)) {
-			vectorTs.put(process, 0);
+	void increment(UUID processId) {
+		if (!logicalClocks.containsKey(processId)) {
+			logicalClocks.put(processId, 0);
 		}
-		int value = vectorTs.get(process) + 1;
-		vectorTs.put(process, value);
+		int value = logicalClocks.get(processId) + 1;
+		logicalClocks.put(processId, value);
 	}
 	
-	public void merge(VectorTimestamp other) {
-		// create union set of all process ids
-		HashMap<UUID, Integer> union = new HashMap<UUID, Integer>();
-		union.putAll(this.vectorTs);
-		for(Entry<UUID, Integer> entry : other.vectorTs.entrySet()) {
-			if(!union.containsKey(entry.getKey())) {
-				union.put(entry.getKey(), entry.getValue());
-			} else if (union.get(entry.getKey()) < entry.getValue()) {
-				union.put(entry.getKey(), entry.getValue());
-			}
+	void merge(VectorTimestamp other) {
+		// add all new logical clocks and update the existing ones to the greater one
+		for(Entry<UUID, Integer> entry : other.logicalClocks.entrySet()) {
+			this.logicalClocks.merge(entry.getKey(), entry.getValue(),
+					(local, remote) -> (remote > local) ? remote : local );
 		}
-		
-		this.vectorTs = union;
 	}
 
 }
