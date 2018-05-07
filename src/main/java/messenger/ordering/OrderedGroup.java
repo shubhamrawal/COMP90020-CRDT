@@ -5,8 +5,11 @@ import messenger.message.Group;
 import messenger.message.Message;
 import texteditor.App;
 
+import java.util.logging.Logger;
+
 public class OrderedGroup<M extends Message> implements Group<M> {
 
+    private static final Logger LOGGER = Logger.getLogger(Thread.currentThread().getStackTrace()[0].getClassName() );
     private Group<OrderedMessage<M>> messageGroup;
     private VectorTimestamp timestamp;
     private MessageBuffer<OrderedMessage<M>> messageBuffer;
@@ -28,11 +31,15 @@ public class OrderedGroup<M extends Message> implements Group<M> {
 
     void receive(OrderedMessage<M> message, Callback<M> callback) {
         // first, compare local timestamp with timestamp of received message
-        int order = this.timestamp.compareTo(message.getTimestamp(), message.getSenderId());
+        int order = timestamp.compareTo(message.getTimestamp(), message.getSenderId());
         if (order == 0) {
             // if received timestamp is expected deliver the message
             timestamp.merge(message.getTimestamp());
-            callback.process(message.getInnerMessage());
+            if (callback != null) {
+                callback.process(message.getInnerMessage());
+            } else {
+                LOGGER.info("No callback attached -> message ignored");
+            }
         } else if (order == -1) {
             // if received timestamp lies in the future, buffer message
             messageBuffer.add(message);
@@ -46,7 +53,11 @@ public class OrderedGroup<M extends Message> implements Group<M> {
                         == 0,
                 bufferedMessage -> {
                     timestamp.merge(bufferedMessage.getTimestamp());
-                    callback.process(bufferedMessage.getInnerMessage());
+                    if (callback != null) {
+                        callback.process(bufferedMessage.getInnerMessage());
+                    } else {
+                        LOGGER.info("No callback attached -> message ignored");
+                    }
                     return true;
                 });
     }
@@ -58,6 +69,5 @@ public class OrderedGroup<M extends Message> implements Group<M> {
 
     public void leave() {
         messageGroup.leave();
-        timestamp = null;
     }
 }
