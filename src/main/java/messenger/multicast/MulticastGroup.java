@@ -78,6 +78,8 @@ public class MulticastGroup<M extends Message> implements Group<M> {
             M message = (M) Message.deserialize(data);
             if (callback != null) {
                 callback.process(message);
+            } else {
+                LOGGER.info("No callback attached -> message ignored");
             }
         } catch (IOException e) {
             LOGGER.warning("Received data could not be turned into valid message object");

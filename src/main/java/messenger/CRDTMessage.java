@@ -38,9 +38,8 @@ public class CRDTMessage implements Message {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         CRDTMessage that = (CRDTMessage) o;
-        boolean result1 = Objects.equals(getSenderId(), that.getSenderId());
-        boolean result2 = Objects.equals(getOperation(), that.getOperation());
-        return result1 && result2;
+        return Objects.equals(getSenderId(), that.getSenderId()) &&
+                Objects.equals(getOperation(), that.getOperation());
     }
 
 }

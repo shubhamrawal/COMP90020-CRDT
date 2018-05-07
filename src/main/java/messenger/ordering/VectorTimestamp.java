@@ -60,7 +60,6 @@ class VectorTimestamp implements Serializable {
 
 		// if other timestamp contains a logical clock that this one does not
 		for(Entry<UUID, Integer> unknownLClock : unknownLClocks.entrySet()) {
-			// if
 			if(unknownLClock.getKey().equals(senderId)) {
 				// if the unknown logical clock is from the sender
 				if(unknownLClock.getValue() != 1) {
