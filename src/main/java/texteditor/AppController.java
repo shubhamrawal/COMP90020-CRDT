@@ -23,10 +23,11 @@ public class AppController {
 	
 	private TextFile textFile;
 	private AppModel model;
+	private int deletes = 0;
 	
 	public AppController(AppModel model) {
 		this.model = model;
-		model.addListner(this);
+		model.addListener(this);
 	}
 	
 	public void remoteInsert(int index, String text) {
@@ -90,16 +91,18 @@ public class AppController {
 	}
 	
 	@FXML
-	private void onKeyPressed(KeyEvent e) {
+	private synchronized void onKeyPressed(KeyEvent e) {
 		KeyCode code = e.getCode();
+		int position = textArea.caretPositionProperty().intValue();
 		if(code.equals(KeyCode.BACK_SPACE)) {
-			int position = textArea.caretPositionProperty().intValue();
-			model.delete(position);
+			if(position != 0) {
+				model.delete(position);
+				deletes++;
+			}
 		} else if(!code.isArrowKey() && !code.isFunctionKey() && !code.isMediaKey() 
 				&& !code.isModifierKey() && !code.isNavigationKey() 
 				&& !code.equals(KeyCode.CAPS)) {
-			int position = textArea.caretPositionProperty().intValue();
-			model.insert(e.getText(), position);
+			model.insert(e.getText(), position, deletes);
 		}
 	}
 	

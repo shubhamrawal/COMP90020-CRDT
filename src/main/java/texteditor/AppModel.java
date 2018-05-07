@@ -40,13 +40,12 @@ public class AppModel {
 		System.exit(0);
 	}
 	
-	public void insert(String ch, int position) {
-		Atom a = new Atom(ch.charAt(0));
-		doc.insert(position, a);
+	public void insert(String ch, int position, int deletes) {
+		Atom atom = new Atom(ch.charAt(0));
+		doc.insert(position, deletes, atom);
 	}
 	
-	public void delete(int position) {
-//		System.out.println(position);
+	public void delete(int position) { 
 		doc.delete(position);
 	}
 	
@@ -59,11 +58,7 @@ public class AppModel {
 		doc.test();
 	}
 	
-	public void addListner(AppController controller) {
+	public void addListener(AppController controller) {
 		this.controller = controller;
-	}
-	
-	public void notifyOperation() {
-		
 	}
 }

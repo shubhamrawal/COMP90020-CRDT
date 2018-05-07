@@ -12,7 +12,7 @@ import java.util.UUID;
 public class CRDTCallback implements Callback<CRDTMessage> {
 	private TreeReplicatedDocument doc;
 	
-	public void addListner(TreeReplicatedDocument doc) {
+	public void addListener(TreeReplicatedDocument doc) {
 		this.doc = doc;
 	}
 
@@ -21,7 +21,6 @@ public class CRDTCallback implements Callback<CRDTMessage> {
     }
 
     private void merge(UUID senderId, Operation operation) {
-        //TODO implement merge here
     		OperationType type = operation.getType();
     		Position posId = operation.getPosId();
     		switch(type) {
@@ -30,6 +29,7 @@ public class CRDTCallback implements Callback<CRDTMessage> {
     				doc.remoteInsert(posId, value);
     				break;
     			case DELETE:
+    				doc.remoteDelete(posId);
     				break;
     		}
     }

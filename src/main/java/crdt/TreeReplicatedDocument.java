@@ -1,5 +1,6 @@
 package crdt;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -9,17 +10,19 @@ import texteditor.AppModel;
 
 public class TreeReplicatedDocument extends ReplicatedDocument {
 	private BinaryTree tree = new BinaryTree();
-	private LinkedList<Position> list = new LinkedList<Position>();
+	private List<Position> list = Collections.synchronizedList(new LinkedList<Position>());
+	private List<Position> trimList = Collections.synchronizedList(new LinkedList<Position>());
 	private UUID udis = UUID.randomUUID();
 	private CRDTCallback callback = new CRDTCallback();
 	private AppModel model;
 	
 	public TreeReplicatedDocument() {
-		callback.addListner(this);
+		callback.addListener(this);
 	}
 
 	@Override
-	public synchronized void insert(int position, Atom newAtom) {
+	public synchronized void insert(int absPosition, int deletes, Atom newAtom) {
+		int position = absPosition + deletes;
 		Position x = null, y = null;
 		if(position == 0) {
 			if(list.size() != 0) {
@@ -34,21 +37,15 @@ public class TreeReplicatedDocument extends ReplicatedDocument {
 
 		Position posId = generatePosId(x, y);
 		list.add(position, posId);
+		trimList.add(absPosition, posId);
 		tree.add(new MiniNode(posId, newAtom));
 	}
-
+	
 	@Override
 	public synchronized void delete(int position) {
-		boolean del = false;
-		if(position > 0 && position <= list.size()) {
-			Position posId = list.get(position-1);
-			tree.delete(posId);
-			del = true;
-		}
-		if(!del) {
-			System.out.println("delete not performed at position: " + position);
-//			System.out.println(list.size());
-		}
+		Position posId = trimList.get(position-1);
+		tree.delete(posId);
+		trimList.remove(position-1);
 	}
 	
 	@Override

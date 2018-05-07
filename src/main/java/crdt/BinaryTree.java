@@ -11,7 +11,7 @@ public class BinaryTree {
 		root = addNode(root, node);
 	}
 	
-	public void delete(Position posId) {
+	public synchronized void delete(Position posId) {
 		Node node = getNodeWithPosId(root, posId);
 		node.deleteMiniNode(posId);
 	}
