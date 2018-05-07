@@ -11,7 +11,8 @@ import crdt.TreeReplicatedDocument;
 
 public class AppModel {
 	
-	private TreeReplicatedDocument tree = new TreeReplicatedDocument();
+	private TreeReplicatedDocument doc = new TreeReplicatedDocument();
+	private AppController controller;
 	
 	public void save(TextFile file) {
 		try {
@@ -39,14 +40,30 @@ public class AppModel {
 	
 	public void insert(String ch, int position) {
 		Atom a = new Atom(ch.charAt(0));
-		tree.insert(position, a);
+		doc.insert(position, a);
 	}
 	
 	public void delete(int position) {
-		tree.delete(position);
+		doc.delete(position);
+	}
+	
+	public void remoteOperation() {
+		controller.updateView();
 	}
 	
 	public void print() {
-		System.out.println(tree.getTreeString());
+		System.out.println(doc.getTreeString());
+	}
+	
+	public void test() {
+		doc.test();
+	}
+	
+	public void addListner(AppController controller) {
+		this.controller = controller;
+	}
+	
+	public void notifyOperation() {
+		
 	}
 }

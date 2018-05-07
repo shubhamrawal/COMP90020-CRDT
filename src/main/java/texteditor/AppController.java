@@ -26,6 +26,11 @@ public class AppController {
 	
 	public AppController(AppModel model) {
 		this.model = model;
+		model.addListner(this);
+	}
+	
+	public void updateView() {
+		
 	}
 	
 	@FXML
@@ -101,6 +106,7 @@ public class AppController {
 	@FXML
 	private void onPrint() {
 		model.print();
+//		model.test();
 	}
 	
 	private void saveFile(Path filePath) {

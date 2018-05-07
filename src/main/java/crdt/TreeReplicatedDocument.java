@@ -10,7 +10,7 @@ public class TreeReplicatedDocument extends ReplicatedDocument {
 	private UUID udis = UUID.randomUUID();
 
 	@Override
-	public void insert(int position, Atom newAtom) {
+	public synchronized void insert(int position, Atom newAtom) {
 		Position x = null, y = null;
 		if(position == 0) {
 			if(list.size() != 0) {
@@ -25,15 +25,42 @@ public class TreeReplicatedDocument extends ReplicatedDocument {
 
 		Position posId = generatePosId(x, y);
 		list.add(position, posId);
-		tree.add(new MiniNode(posId, newAtom)); 
+		tree.add(new MiniNode(posId, newAtom));
 	}
 
 	@Override
-	public void delete(int position) {
+	public synchronized void delete(int position) {
 		if(list.size() > 0 && position < list.size()) {
 			Position posId = list.get(position);
 			tree.delete(posId);
 		}
+	}
+	
+	@Override
+	public synchronized void remoteInsert(MiniNode node) {
+		Position posId = node.getPosId();
+		Atom value = node.getAtom();
+		boolean added = false;
+		for(int i = 0; i < list.size(); i++) {
+			Position next = list.get(i);
+			if(next.lessThan(posId)) {
+				list.add(i, posId);
+				tree.add(node);
+				added = true;
+			}
+		}
+		if(!added) {
+			list.add(posId);
+			tree.add(node);
+		}
+		
+		// update view
+		// model.updateView(i, value);
+	}
+	
+	@Override
+	public synchronized void remoteDelete(MiniNode node) {
+		
 	}
 	
 	public String getTreeString() {
@@ -48,6 +75,15 @@ public class TreeReplicatedDocument extends ReplicatedDocument {
 	
 	public void printString() {
 		tree.printString();
+	}
+	
+	public void test() {
+		for(int i = 0; i < list.size()-1; i++) {
+			if(list.get(i+1).lessThan(list.get(i))) {
+				System.out.println("Less Than");
+			}
+		}
+		System.out.println("Finished");
 	}
 	
 	private Position generatePosId(Position x, Position y) {

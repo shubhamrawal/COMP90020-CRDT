@@ -14,6 +14,10 @@ public class MiniNode {
 		return posId;
 	}
 	
+	public Atom getAtom() {
+		return value;
+	}
+	
 	public void delete() {
 		isDeleted = true;
 	}
