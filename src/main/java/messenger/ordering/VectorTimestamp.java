@@ -1,13 +1,13 @@
 package messenger.ordering;
 
-import com.google.common.collect.Maps;
+//import com.google.common.collect.Maps;
 
 import java.io.Serializable;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.Vector;
 
 class VectorTimestamp implements Serializable {
 
@@ -21,63 +21,106 @@ class VectorTimestamp implements Serializable {
 	VectorTimestamp(HashMap<UUID,Integer> logicalClocks) {
 		this.logicalClocks = logicalClocks;
 	}
-
+	
+	public int getTimestamp(UUID processID) {
+		return logicalClocks.get(processID);
+	}
 	/*
-	 *  returns 1 if other timestamp is in the past
-	 *  		0 if other timestamp can be delivered
-	 *  		-1 if other timestamp is in the future
+	 * *
+	 * look for the past timestamp only
+	 * doesn't care whether concurrent, greater or greater equal case
+	 * because concurrent case was handled by isDelivable method
 	 */
-	public int compareTo(VectorTimestamp other, UUID senderId){
-
-		boolean expected = true;
-		boolean past = true;
-
-		for (Entry<UUID, Integer> logicalClock: this.logicalClocks.entrySet()) {
-
-			// we skip over any logical clock that is not contained in the other timestamp
-			if (other.logicalClocks.containsKey(logicalClock.getKey())) {
-				// if any logical clock of the other timestamp is greater than the corresponding local logical clock,
-				// then it cannot be a past timestamp
-				if(logicalClock.getValue() < other.logicalClocks.get(logicalClock.getKey())){
-					past = false;
+	public boolean isPast(VectorTimestamp other){
+		//generate union key set between local and other logicalClock
+		Vector<UUID> keys = new Vector<UUID>();
+		keys.addAll(logicalClocks.keySet());
+		for (UUID u: other.getVector().keySet()) {
+			if(!keys.contains(u)) {
+				keys.add(u);
+			}
+		}
+		// compare the value associated with each processID by iterating the union key set.
+		boolean first = true;
+		int less = -2;
+		int equal = 0;
+		int less_eq = -1;
+		int concurrent = 3;
+		int greaterOrgreater_eq = 2;
+		int result = concurrent;
+		for (UUID id: keys) {
+			int v1 = logicalClocks.get(id);
+			int v2 = other.getVector().get(id);
+			
+			if (v1 < v2) {
+				if (first || result == less){
+					result = less;
 				}
-
-				// other timestamp is not expected if either of these conditions hold
-				if (logicalClock.getKey().equals(senderId)) {
-					if(logicalClock.getValue() + 1 != other.logicalClocks.get(senderId)) {
-						expected = false;
+				else{
+					if (result == less_eq || result == equal) {
+						result = less_eq;
 					}
-				} else {
-					if(logicalClock.getValue() < other.logicalClocks.get(logicalClock.getKey())){
-						expected = false;
+					else{
+						result = concurrent;
+						break;
 					}
 				}
 			}
-		}
-
-		// now we have to deal with logical clocks of the other timestamp that are not part of this one
-		Map<UUID, Integer> unknownLClocks = Maps.difference(this.logicalClocks, other.logicalClocks).entriesOnlyOnRight();
-
-		// if other timestamp contains a logical clock that this one does not
-		for(Entry<UUID, Integer> unknownLClock : unknownLClocks.entrySet()) {
-			if(unknownLClock.getKey().equals(senderId)) {
-				// if the unknown logical clock is from the sender
-				if(unknownLClock.getValue() != 1) {
-					// and the logical clock is not 1,
-					// it is a future timestamp and we need to wait for the first timestamp from that sender
-					return -1;
+			else if (v1 == v2) {
+				if (first || result == equal) {
+					result =equal;
 				}
-			} else {
-				// if the unknown logical clock is not from the sender the timestamp is in the future
-				return -1;
+				else {
+					if(result == less_eq || result == less) {
+						result = less_eq;
+					} else {
+						result = greaterOrgreater_eq;
+						break;
+					}
+				}
+			}
+			else{
+				result = greaterOrgreater_eq;
+				break;
+			}
+			first = false;
+		}
+		if (result == less ||result == less_eq) {
+			return true;
+		}
+		return false;
+	}
+	
+	public boolean isDeliverable(VectorTimestamp other, UUID sender) {
+		int greater = 0;
+		int less = 0;
+		int sent = other.getTimestamp(sender);
+		int seen = logicalClocks.get(sender);
+		UUID processID;
+		if (sent == (seen + 1)) {
+			for (Entry<UUID, Integer> entry: logicalClocks.entrySet()) {
+				processID = entry.getKey();
+				if (!processID.equals(sender)) {
+					if (other.getTimestamp(processID) > logicalClocks.get(processID))
+						greater ++;
+					else if (other.getTimestamp(processID) < logicalClocks.get(processID))
+						less ++;
+				}
+			}
+			// concurrent case
+			if (greater >= 1 && less >= 1) {
+				return true;
+			}
+			// satisfied condition to deliver
+			else if (greater == 0) {
+				return true;
 			}
 		}
-
-		if (expected) {
-			return 0;
-		} else {
-			return past ? 1 : -1;
-		}
+		return false;	
+	}
+	
+	public HashMap<UUID, Integer> getVector() {
+		return logicalClocks;
 	}
 
 	void increment(UUID processId) {
@@ -88,12 +131,21 @@ class VectorTimestamp implements Serializable {
 		logicalClocks.put(processId, value);
 	}
 	
-	void merge(VectorTimestamp other) {
-		// add all new logical clocks and update the existing ones to the greater one
+	public void set(UUID processID, int value) {
+		logicalClocks.put(processID, value);
+	}
+	
+	public void merge(VectorTimestamp other) {
+		HashMap<UUID, Integer> union = new HashMap<UUID, Integer>();
+		union.putAll(this.logicalClocks);
 		for(Entry<UUID, Integer> entry : other.logicalClocks.entrySet()) {
-			this.logicalClocks.merge(entry.getKey(), entry.getValue(),
-					(local, remote) -> (remote > local) ? remote : local );
+			if(!union.containsKey(entry.getKey())) {
+				union.put(entry.getKey(), entry.getValue());
+			} else if (union.get(entry.getKey()) < entry.getValue()) {
+				union.put(entry.getKey(), entry.getValue());
+			}
 		}
+		this.logicalClocks = union;
 	}
 
     @Override
