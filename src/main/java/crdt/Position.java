@@ -48,8 +48,16 @@ public class Position {
 		return (!lessThan(x) && !equalTo(x));
 	}
 	
+	public boolean isPathEmpty() {
+		return path.equals("");
+	}
+	
 	public String getPath() {
 		return path;
+	}
+	
+	public boolean isNodeEmpty() {
+		return node.equals("");
 	}
 	
 	public String getNode() {

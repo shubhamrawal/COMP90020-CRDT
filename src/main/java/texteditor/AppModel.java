@@ -14,6 +14,10 @@ public class AppModel {
 	private TreeReplicatedDocument doc = new TreeReplicatedDocument();
 	private AppController controller;
 	
+	public AppModel() {
+		doc.addListner(this);
+	}
+	
 	public void save(TextFile file) {
 		try {
 			Files.write(file.getFilePath(), file.getContent(), StandardOpenOption.CREATE);
@@ -42,18 +46,16 @@ public class AppModel {
 	}
 	
 	public void delete(int position) {
+//		System.out.println(position);
 		doc.delete(position);
 	}
 	
-	public void remoteOperation() {
-		controller.updateView();
-	}
-	
-	public void print() {
-		System.out.println(doc.getTreeString());
+	public void remoteInsert(int index, String text) {
+		controller.remoteInsert(index, text);
 	}
 	
 	public void test() {
+		System.out.println(doc.getTreeString());
 		doc.test();
 	}
 	

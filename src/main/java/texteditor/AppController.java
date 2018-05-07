@@ -29,8 +29,8 @@ public class AppController {
 		model.addListner(this);
 	}
 	
-	public void updateView() {
-		
+	public void remoteInsert(int index, String text) {
+		textArea.insertText(index, text);
 	}
 	
 	@FXML
@@ -104,9 +104,8 @@ public class AppController {
 	}
 	
 	@FXML
-	private void onPrint() {
-		model.print();
-//		model.test();
+	private void onTest() {
+		model.test();
 	}
 	
 	private void saveFile(Path filePath) {
