@@ -13,14 +13,14 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.logging.Logger;
 
-public class MulticastGroup implements Group<Message> {
+public class MulticastGroup<M extends Message> implements Group<M> {
 
     private static final Logger LOGGER = Logger.getLogger(Thread.currentThread().getStackTrace()[0].getClassName() );
     private String multicastHost;
     private int multicastPort;
     private InetAddress receiveInetAddress;
     private MulticastSocket receiveMulticastSocket;
-    private Callback<Message> callback;
+    private Callback<M> callback;
     private ExecutorService service = Executors.newFixedThreadPool(1);
     private Future future;
 
@@ -30,7 +30,7 @@ public class MulticastGroup implements Group<Message> {
         this.multicastPort = multicastPort;
     }
 
-    public void send(Message message) {
+    public void send(M message) {
         try {
             sendMulticast(Message.serialize(message));
         } catch (IOException e) {
@@ -38,7 +38,7 @@ public class MulticastGroup implements Group<Message> {
         }
     }
 
-    public void onReceipt(Callback<Message> callback) {
+    public void onReceipt(Callback<M> callback) {
         this.callback = callback;
     }
 
@@ -75,7 +75,7 @@ public class MulticastGroup implements Group<Message> {
 
     private void receive(byte[] data) {
         try {
-            Message message = Message.deserialize(data);
+            M message = (M) Message.deserialize(data);
             if (callback != null) {
                 callback.process(message);
             }

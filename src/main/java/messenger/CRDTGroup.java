@@ -1,24 +1,21 @@
 package messenger;
 
-import crdt.Operation;
+import messenger.message.Callback;
 import messenger.message.Group;
-import messenger.message.Message;
 
-import java.util.UUID;
+public class CRDTGroup implements Group<CRDTMessage> {
 
-public class CRDTGroup {
+    private Group<CRDTMessage> messageGroup;
 
-    private Group<Message> messageGroup;
-
-    public CRDTGroup(Group<Message> messageGroup) {
+    public CRDTGroup(Group<CRDTMessage> messageGroup) {
         this.messageGroup = messageGroup;
     }
 
-    public void send(UUID memberId, Operation operation) {
-        this.messageGroup.send(new CRDTMessage(memberId, operation));
+    public void send(CRDTMessage message) {
+        this.messageGroup.send(message);
     }
 
-    public void onReceipt(CRDTCallback crdtCallback) {
+    public void onReceipt(Callback<CRDTMessage> crdtCallback) {
         this.messageGroup.onReceipt(crdtCallback);
     }
 

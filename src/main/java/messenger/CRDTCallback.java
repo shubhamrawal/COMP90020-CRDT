@@ -2,16 +2,16 @@ package messenger;
 
 import crdt.Operation;
 import messenger.message.Callback;
-import messenger.message.Message;
 
 import java.util.UUID;
 
-public abstract class CRDTCallback implements Callback<Message> {
+public class CRDTCallback implements Callback<CRDTMessage> {
 
-    void process(CRDTMessage crdtMessage) {
-        merge(crdtMessage.getMemberId(), crdtMessage.getOperation());
+    public void process(CRDTMessage crdtMessage) {
+        merge(crdtMessage.getSenderId(), crdtMessage.getOperation());
     }
 
-    //TODO overwrite and implement merge
-    public abstract void merge(UUID memberId, Operation operation);
+    private void merge(UUID senderId, Operation operation) {
+        //TODO implement merge here
+    }
 }

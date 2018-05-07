@@ -8,21 +8,21 @@ import java.util.UUID;
 
 public class CRDTMessage implements Message {
 
-    private UUID memberId;
+    private UUID senderId;
     private Operation operation;
 
-    public CRDTMessage(UUID memberId, Operation operation) {
+    public CRDTMessage(UUID senderId, Operation operation) {
 
-        this.memberId = memberId;
+        this.senderId = senderId;
         this.operation = operation;
     }
 
-    public UUID getMemberId() {
-        return memberId;
+    public UUID getSenderId() {
+        return senderId;
     }
 
-    public void setMemberId(UUID memberId) {
-        this.memberId = memberId;
+    public void setSenderId(UUID senderId) {
+        this.senderId = senderId;
     }
 
     public Operation getOperation() {
@@ -38,7 +38,7 @@ public class CRDTMessage implements Message {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         CRDTMessage that = (CRDTMessage) o;
-        boolean result1 = Objects.equals(getMemberId(), that.getMemberId());
+        boolean result1 = Objects.equals(getSenderId(), that.getSenderId());
         boolean result2 = Objects.equals(getOperation(), that.getOperation());
         return result1 && result2;
     }
