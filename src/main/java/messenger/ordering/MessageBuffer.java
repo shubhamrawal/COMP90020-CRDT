@@ -2,11 +2,12 @@ package messenger.ordering;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.function.Function;
+import java.util.UUID;
 
 class MessageBuffer<M extends OrderedMessage> {
 	
 	private ArrayList<M> buffer;
+	private VectorTimestamp vectorClocks;
 	
 	MessageBuffer() {
 		buffer = new ArrayList<M>();
@@ -16,20 +17,24 @@ class MessageBuffer<M extends OrderedMessage> {
 		buffer.add(message);
 	}
 
-	void applyAndRemoveIfTrue(Function<M, Boolean> condition, Function<M, Boolean> operation) {
-		Iterator<M> iterator = buffer.iterator();
-
-		while(iterator.hasNext()) {
-			M message = iterator.next();
-			if(condition.apply(message)) {
-				operation.apply(message);
-				iterator.remove();
-			}
-		}
-	}
-
 	int getSize() {
 		return buffer.size();
 	}
-
+	
+	public M checkbuffer() {
+		 		VectorTimestamp other;
+		 		UUID sender;
+		 		int msgIndex;
+		 		if (!buffer.isEmpty()) {
+		 			for (int i = 0; i < buffer.size(); i++) {
+		 				other = buffer.get(i).getTimestamp();
+		 				sender = buffer.get(i).getSenderId();
+		 				if (vectorClocks.isDeliverable(other, sender)){
+		 					msgIndex = buffer.indexOf(buffer.get(i));
+		 					return buffer.remove(msgIndex);
+		 				}
+		 			}
+		 		}
+		 		return null;
+		  	}
 }
