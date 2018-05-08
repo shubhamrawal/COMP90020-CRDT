@@ -3,6 +3,11 @@ package crdt;
 import java.util.UUID;
 
 public class Position {
+	public static final String LEFT_NODE = "0";
+	public static final String RIGHT_NODE = "1";
+	public static final String EMPTY_PATH = "";
+	public static final String EMPTY_NODE = "";
+	
 	private String path;
 	private String node;
 	private UUID udis;
@@ -16,10 +21,12 @@ public class Position {
 	public boolean lessThan(Position x) {
 		String a = this.path + this.node;
 		String b = x.getPath() + x.getNode();
-		if(a.length() < b.length() && b.startsWith(a) && b.charAt(a.length()) == '1') {
+		if(a.length() < b.length() && b.startsWith(a) && 
+				String.valueOf(b.charAt(a.length())) == RIGHT_NODE) {
 			return true;
 		}
-		if(b.length() < a.length() && a.startsWith(b) && a.charAt(b.length()) == '0') {
+		if(b.length() < a.length() && a.startsWith(b) && 
+				String.valueOf(a.charAt(b.length())) == LEFT_NODE) {
 			return true;
 		}
 		int index = commonPrefix(a, b);
@@ -84,7 +91,7 @@ public class Position {
 	}
 	
 	private boolean isRoot() {
-		return (path + node).equals("");
+		return (path + node).equals(EMPTY_PATH);
 	}
 	
 	private boolean isParentOf(Position x) {
@@ -95,9 +102,11 @@ public class Position {
 		String xPath = x.getPath();
 		int len = x.getPath().length();
 		if(len>1) {
-			return new Position(xPath.substring(0, len-2), xPath.substring(len-2, len-1), x.getUDIS());
+			return new Position(xPath.substring(0, len-1), xPath.substring(len-1, len), x.getUDIS());
+		} else if(len == 1) {
+			return new Position(EMPTY_PATH, xPath.substring(0, 1), x.getUDIS());
 		}
-		return new Position("", "", x.getUDIS());
+		return new Position(EMPTY_PATH, EMPTY_NODE, x.getUDIS());
 	}
 	
 	private int commonPrefix(String a, String b) {

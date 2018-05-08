@@ -22,6 +22,7 @@ public class BinaryTree {
 	
 	public List<String> getTreeAsList() {
 		stringList = new ArrayList<String>();
+		if(root == null) return null;
 		processTree(root);
 		return stringList;
 	}

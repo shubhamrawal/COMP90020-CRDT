@@ -23,7 +23,6 @@ public class AppController {
 	
 	private TextFile textFile;
 	private AppModel model;
-	private int deletes = 0;
 	
 	public AppController(AppModel model) {
 		this.model = model;
@@ -32,6 +31,10 @@ public class AppController {
 	
 	public void remoteInsert(int index, String text) {
 		textArea.insertText(index, text);
+	}
+	
+	public void remoteDelete(int index) {
+		textArea.deleteText(index, index+1);
 	}
 	
 	@FXML
@@ -97,12 +100,11 @@ public class AppController {
 		if(code.equals(KeyCode.BACK_SPACE)) {
 			if(position != 0) {
 				model.delete(position);
-				deletes++;
 			}
 		} else if(!code.isArrowKey() && !code.isFunctionKey() && !code.isMediaKey() 
 				&& !code.isModifierKey() && !code.isNavigationKey() 
 				&& !code.equals(KeyCode.CAPS)) {
-			model.insert(e.getText(), position, deletes);
+			model.insert(e.getText(), position);
 		}
 	}
 	

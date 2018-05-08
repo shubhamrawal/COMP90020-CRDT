@@ -40,9 +40,9 @@ public class AppModel {
 		System.exit(0);
 	}
 	
-	public void insert(String ch, int position, int deletes) {
+	public void insert(String ch, int position) {
 		Atom atom = new Atom(ch.charAt(0));
-		doc.insert(position, deletes, atom);
+		doc.insert(position, atom);
 	}
 	
 	public void delete(int position) { 
@@ -53,9 +53,14 @@ public class AppModel {
 		controller.remoteInsert(index, text);
 	}
 	
+	public void remoteDelete(int index) {
+		controller.remoteDelete(index);
+	}
+	
 	public void test() {
 		System.out.println(doc.getTreeString());
-		doc.test();
+//		doc.remoteInsertTest();
+//		doc.remoteDeleteTest();
 	}
 	
 	public void addListener(AppController controller) {
