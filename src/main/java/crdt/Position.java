@@ -56,7 +56,7 @@ public class Position {
 	}
 	
 	public boolean isPathEmpty() {
-		return path.equals("");
+		return path.equals(EMPTY_PATH);
 	}
 	
 	public String getPath() {
@@ -64,7 +64,7 @@ public class Position {
 	}
 	
 	public boolean isNodeEmpty() {
-		return node.equals("");
+		return node.equals(EMPTY_NODE);
 	}
 	
 	public String getNode() {
