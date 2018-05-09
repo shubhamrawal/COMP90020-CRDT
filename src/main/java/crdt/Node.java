@@ -14,7 +14,7 @@ public class Node {
 	}
 	
 	public Node addMiniNode(MiniNode node) {
-		// change to account for udis
+		// TODO change to account for udis
 		nodes.add(node);
 		return this;
 	}
@@ -33,6 +33,7 @@ public class Node {
 	}
 	
 	public Position getNodeId() {
+		// TODO only used for path and node. udis not to be used
 		return nodes.get(0).getPosId();
 	}
 	
