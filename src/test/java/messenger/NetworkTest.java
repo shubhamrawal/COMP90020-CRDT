@@ -24,7 +24,7 @@ public class NetworkTest {
         processB.leave();
 
         // TODO flaky test: fails when debugging it!!!
-        //verify(callback).process(crdtMessage);
+        verify(callback).process(crdtMessage);
     }
 
     @Test

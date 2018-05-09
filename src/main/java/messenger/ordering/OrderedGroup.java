@@ -20,7 +20,7 @@ public class OrderedGroup<M extends Message> implements Group<M> {
         this.messageBuffer = new MessageBuffer<OrderedMessage<M>>();
     }
 
-    public void send(M message) {
+    public synchronized void send(M message) {
         this.timestamp.increment(App.uuid);
         messageGroup.send(new OrderedMessage<M>(App.uuid, this.timestamp, message));
     }
@@ -29,7 +29,7 @@ public class OrderedGroup<M extends Message> implements Group<M> {
         this.messageGroup.onReceipt(message -> receive(message, callback));
     }
 
-    void receive(OrderedMessage<M> message, Callback<M> callback) {
+    synchronized void receive(OrderedMessage<M> message, Callback<M> callback) {
         // first, compare local timestamp with timestamp of received message
         int order = timestamp.compareTo(message.getTimestamp(), message.getSenderId());
         if (order == 0) {
