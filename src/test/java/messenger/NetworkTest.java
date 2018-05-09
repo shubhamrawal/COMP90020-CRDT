@@ -14,7 +14,7 @@ public class NetworkTest {
         CRDTGroup processA = Network.getInstance().create("224.224.224.3", 9998);
         CRDTGroup processB = Network.getInstance().create("224.224.224.3", 9998);
         UUID uuid = UUID.fromString("067e6162-3b6f-4ae2-a171-2470b63dff00");
-        Operation operation = new Operation();
+        Operation operation = TestUtil.createOperation();
         CRDTMessage crdtMessage = new CRDTMessage(uuid, operation);
         CRDTCallback callback = mock(CRDTCallback.class);
 
@@ -34,7 +34,7 @@ public class NetworkTest {
     public void ownMessageIsIgnored() {
         CRDTGroup processA = Network.getInstance().create("224.224.224.2", 9997);
         UUID uuid = UUID.fromString("067e6162-3b6f-4ae2-a171-2470b63dff00");
-        Operation operation = new Operation();
+        Operation operation = TestUtil.createOperation();
         CRDTMessage crdtMessage = new CRDTMessage(uuid, operation);
         CRDTCallback crdtCallback = mock(CRDTCallback.class);
 

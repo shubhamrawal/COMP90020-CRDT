@@ -1,68 +1,193 @@
 package crdt;
 
 import java.util.LinkedList;
+import java.util.List;
 import java.util.UUID;
 
+import messenger.CRDTCallback;
+import texteditor.AppModel;
+
 public class TreeReplicatedDocument extends ReplicatedDocument {
+	public static final boolean IS_INSERT = true;
+	
 	private BinaryTree tree = new BinaryTree();
-	private LinkedList<Position> list = new LinkedList<Position>();
+	// make the lists synchronized
+	private List<Position> insertList = new LinkedList<Position>();
+	private List<Position> deleteList = new LinkedList<Position>();
 	private UUID udis = UUID.randomUUID();
-
-	@Override
-	public void insert(int position, Atom newAtom) {
-		Position x = null, y = null;
-		if(position == 0) {
-			if(list.size() != 0) {
-				y = list.get(0);
-			}
-		} else if(position == list.size()) {
-			x = list.get(list.size()-1);
-		} else {
-			x = list.get(position-1);
-			y = list.get(position);
-		}
-
-		Position posId = generatePosId(x, y);
-		list.add(position, posId);
-		tree.add(posId, new MiniNode(newAtom));
+	private CRDTCallback callback = new CRDTCallback();
+	private AppModel model;
+	
+	public TreeReplicatedDocument() {
+		callback.addListener(this);
 	}
 
 	@Override
-	public void delete(int position) {
+	public synchronized void insert(int position, Atom newAtom) {
+		int insertPosition = findPosition(IS_INSERT, position);
+		int size = insertList.size();
+		Position x = null, y = null;
+		if(insertPosition == 0) {
+			if(size != 0) {
+				y = insertList.get(0);
+			}
+		} else if(insertPosition == size) {
+			x = insertList.get(size-1);
+		} else {
+			x = insertList.get(insertPosition-1);
+			y = insertList.get(insertPosition);
+		}
+
+		Position posId = generatePosId(x, y);
+		insertList.add(insertPosition, posId);
+		tree.add(new MiniNode(posId, newAtom));
+	}
+	
+	@Override
+	public synchronized void delete(int position) {
+		int deletePosition = findPosition(!IS_INSERT, position);
+		Position posId = insertList.get(deletePosition);
+		deleteList.add(posId);
+		tree.delete(posId);
+	}
+
+	@Override
+	public synchronized void remoteInsert(Position posId, Atom newAtom) {
+		boolean added = false;
+		int index = 0;
+		String text = newAtom.toString();
+		for(int i = 0; i < insertList.size(); i++) {
+			Position next = insertList.get(i);
+			if(posId.lessThan(next)) {
+				insertList.add(i, posId);
+				added = true;
+				break;
+			}
+			if(!deleteList.contains(next)) {
+				index++;
+			}
+		}
+		if(!added) {
+			insertList.add(posId);
+			index++;
+		}
+		tree.add(new MiniNode(posId, newAtom));
+		model.remoteInsert(index, text);
+	}
+
+	@Override
+	public synchronized void remoteDelete(Position posId) {
+		int index = 0;
+		for(int i = 0; i < insertList.size(); i++) {
+			Position next = insertList.get(i);
+			if(posId.equalTo(next)) {
+				deleteList.add(posId);
+				break;
+			}
+			if(!deleteList.contains(next)) {
+				index++;
+			}
+		}
+		tree.delete(posId);
+		model.remoteDelete(index);
+	}
+	
+	public String getTreeString() {
+		List<String> treeList = tree.getTreeAsList();
+		if(treeList == null) return "";
+		StringBuilder treeString = new StringBuilder();
+		for(String element : treeList) {
+			treeString.append(element);
+		}
 		
+		return treeString.toString();
 	}
 	
 	public void printString() {
 		tree.printString();
 	}
 	
+	// TODO remove
+	public void remoteInsertTest() {
+		String test = "hello world\n";
+		for(int i = 0; i < test.length(); i++) {
+			Position posId = getTestPositionId(i+2);
+			remoteInsert(posId, new Atom(test.charAt(i)));
+		}
+	}
+	
+	// TODO remove
+	public void remoteDeleteTest() {
+		for(int i = 10; i > 8; i--) {
+			int deletePosition = findPosition(!IS_INSERT, i);
+			System.out.println("position: " + deletePosition);
+			Position posId = insertList.get(deletePosition);
+			remoteDelete(posId);
+		}
+	}
+	
+	// TODO remove
+	public Position getTestPositionId(int position) {
+		int insertPosition = findPosition(IS_INSERT, position);
+		Position x = null, y = null;
+		if(insertPosition == 0) {
+			if(insertList.size() != 0) {
+				y = insertList.get(0);
+			}
+		} else if(insertPosition == insertList.size()) {
+			x = insertList.get(insertList.size()-1);
+		} else {
+			x = insertList.get(insertPosition-1);
+			y = insertList.get(insertPosition);
+		}
+		
+		return generatePosId(x, y);
+	}
+	
+	public void addListner(AppModel model) {
+		this.model = model;
+	}
+	
+	private int findPosition(boolean isInsert, int position) {
+		int count = 0;
+		for(int i = 0; i < insertList.size(); i++) {
+			if(!deleteList.contains(insertList.get(i))) {
+				count++;
+			}
+			if(count == ((isInsert) ? position+1 : position)) {
+				return i;
+			}
+		}
+		return insertList.size();
+	}
+	
 	private Position generatePosId(Position x, Position y) {
 		if(x == null && y == null) {
-			return new Position("", "", udis);
+			return new Position(Position.EMPTY_PATH, Position.EMPTY_NODE, udis);
 		}
 		if(y == null) {
-			if(x.getNode().equals("")) {
-				return new Position("", "1", udis);
+			if(x.isNodeEmpty()) {
+				return new Position(Position.EMPTY_PATH, Position.RIGHT_NODE, udis);
 			} else {
-				return new Position(x.getPath() + x.getNode(), "1", udis);
+				return new Position(x.getPath() + x.getNode(), Position.RIGHT_NODE, udis);
 			}
 		}
 		if(x == null) {
-			if(y.getNode().equals("")) {
-				return new Position("", "0", udis);
+			if(y.isNodeEmpty()) {
+				return new Position(Position.EMPTY_PATH, Position.LEFT_NODE, udis);
 			} else {
-				return new Position(y.getPath() + y.getNode(), "0", udis);
+				return new Position(y.getPath() + y.getNode(), Position.LEFT_NODE, udis);
 			}
 		}
 		
 		if(x.isAncestorOf(y)) {
-			return new Position(y.getPath() + y.getNode(), "0", udis);
+			return new Position(y.getPath() + y.getNode(), Position.LEFT_NODE, udis);
 		} else if(y.isAncestorOf(x)) {
-			return new Position(x.getPath() + x.getNode(), "1", udis);
+			return new Position(x.getPath() + x.getNode(), Position.RIGHT_NODE, udis);
 		} else if(areMiniSiblings(x, y)) {
-			return new Position(x.getPath(), "1", udis);
+			return new Position(x.getPath(), Position.RIGHT_NODE, udis);
 		} else {
-			return new Position(x.getPath() + x.getNode(), "1", udis);
+			return new Position(x.getPath() + x.getNode(), Position.RIGHT_NODE, udis);
 		}
 	}
 	

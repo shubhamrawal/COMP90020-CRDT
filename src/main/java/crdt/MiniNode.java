@@ -1,10 +1,29 @@
 package crdt;
 
 public class MiniNode {
+	private Position posId;
 	private Atom value;
+	private boolean isDeleted;
 	
-	public MiniNode(Atom value) {
+	public MiniNode(Position posId, Atom value) {
+		this.posId = posId;
 		this.value = value;
+	}
+	
+	public Position getPosId() {
+		return posId;
+	}
+	
+	public Atom getAtom() {
+		return value;
+	}
+	
+	public void delete() {
+		isDeleted = true;
+	}
+	
+	public boolean isTombstone() {
+		return isDeleted;
 	}
 	
 	public String toString() {

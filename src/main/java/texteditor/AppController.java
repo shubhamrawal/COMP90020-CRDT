@@ -12,7 +12,6 @@ import javafx.stage.FileChooser;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.List;
 
 public class AppController {
 	@FXML
@@ -27,6 +26,15 @@ public class AppController {
 	
 	public AppController(AppModel model) {
 		this.model = model;
+		model.addListener(this);
+	}
+	
+	public void remoteInsert(int index, String text) {
+		textArea.insertText(index, text);
+	}
+	
+	public void remoteDelete(int index) {
+		textArea.deleteText(index, index+1);
 	}
 	
 	@FXML
@@ -86,16 +94,23 @@ public class AppController {
 	}
 	
 	@FXML
-	private void onKeyPressed(KeyEvent e) {
-		if(e.getCode().isDigitKey() || e.getCode().isLetterKey() || e.getCode().isWhitespaceKey()) {
-			int position = textArea.caretPositionProperty().intValue();
+	private synchronized void onKeyPressed(KeyEvent e) {
+		KeyCode code = e.getCode();
+		int position = textArea.caretPositionProperty().intValue();
+		if(code.equals(KeyCode.BACK_SPACE)) {
+			if(position != 0) {
+				model.delete(position);
+			}
+		} else if(!code.isArrowKey() && !code.isFunctionKey() && !code.isMediaKey() 
+				&& !code.isModifierKey() && !code.isNavigationKey() 
+				&& !code.equals(KeyCode.CAPS)) {
 			model.insert(e.getText(), position);
 		}
 	}
 	
 	@FXML
-	private void onPrint() {
-		model.print();
+	private void onTest() {
+		model.test();
 	}
 	
 	private void saveFile(Path filePath) {

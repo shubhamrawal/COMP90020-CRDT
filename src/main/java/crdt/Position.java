@@ -1,8 +1,15 @@
 package crdt;
 
+import java.io.Serializable;
+import java.util.Objects;
 import java.util.UUID;
 
-public class Position {
+public class Position implements Serializable {
+	public static final String LEFT_NODE = "0";
+	public static final String RIGHT_NODE = "1";
+	public static final String EMPTY_PATH = "";
+	public static final String EMPTY_NODE = "";
+	
 	private String path;
 	private String node;
 	private UUID udis;
@@ -16,10 +23,12 @@ public class Position {
 	public boolean lessThan(Position x) {
 		String a = this.path + this.node;
 		String b = x.getPath() + x.getNode();
-		if(b.startsWith(a) && b.charAt(a.length()) == '1') {
+		if(a.length() < b.length() && b.startsWith(a) && 
+				String.valueOf(b.charAt(a.length())) == RIGHT_NODE) {
 			return true;
 		}
-		if(a.startsWith(b) && a.charAt(b.length()) == '0') {
+		if(b.length() < a.length() && a.startsWith(b) && 
+				String.valueOf(a.charAt(b.length())) == LEFT_NODE) {
 			return true;
 		}
 		int index = commonPrefix(a, b);
@@ -30,8 +39,15 @@ public class Position {
 		return false;
 	}
 	
-	public boolean equalTo(Position x) {
+	public boolean equalToNodeId(Position x) {
 		if(this.path.equals(x.getPath()) && this.node.equals(x.getNode())) {
+			return true;
+		}
+		return false;
+	}
+	
+	public boolean equalTo(Position x) {
+		if(equalToNodeId(x) && this.udis.equals(x.getUDIS())) {
 			return true;
 		}
 		return false;
@@ -41,8 +57,16 @@ public class Position {
 		return (!lessThan(x) && !equalTo(x));
 	}
 	
+	public boolean isPathEmpty() {
+		return path.equals(EMPTY_PATH);
+	}
+	
 	public String getPath() {
 		return path;
+	}
+	
+	public boolean isNodeEmpty() {
+		return node.equals(EMPTY_NODE);
 	}
 	
 	public String getNode() {
@@ -69,7 +93,7 @@ public class Position {
 	}
 	
 	private boolean isRoot() {
-		return (path + node).equals("");
+		return (path + node).equals(EMPTY_PATH);
 	}
 	
 	private boolean isParentOf(Position x) {
@@ -80,9 +104,11 @@ public class Position {
 		String xPath = x.getPath();
 		int len = x.getPath().length();
 		if(len>1) {
-			return new Position(xPath.substring(0, len-2), xPath.substring(len-2, len-1), x.getUDIS());
+			return new Position(xPath.substring(0, len-1), xPath.substring(len-1, len), x.getUDIS());
+		} else if(len == 1) {
+			return new Position(EMPTY_PATH, xPath.substring(0, 1), x.getUDIS());
 		}
-		return new Position("", "", x.getUDIS());
+		return new Position(EMPTY_PATH, EMPTY_NODE, x.getUDIS());
 	}
 	
 	private int commonPrefix(String a, String b) {
@@ -95,5 +121,21 @@ public class Position {
 		}
 		
 		return count;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		Position position = (Position) o;
+		return Objects.equals(getPath(), position.getPath()) &&
+				Objects.equals(getNode(), position.getNode()) &&
+				Objects.equals(udis, position.udis);
+	}
+
+	@Override
+	public int hashCode() {
+
+		return Objects.hash(getPath(), getNode(), udis);
 	}
 }

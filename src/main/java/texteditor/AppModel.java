@@ -11,7 +11,12 @@ import java.util.List;
 
 public class AppModel {
 	
-	private TreeReplicatedDocument tree = new TreeReplicatedDocument();
+	private TreeReplicatedDocument doc = new TreeReplicatedDocument();
+	private AppController controller;
+	
+	public AppModel() {
+		doc.addListner(this);
+	}
 	
 	public void save(TextFile file) {
 		try {
@@ -36,11 +41,29 @@ public class AppModel {
 	}
 	
 	public void insert(String ch, int position) {
-		Atom a = new Atom(ch);
-		tree.insert(position, a);
+		Atom atom = new Atom(ch.charAt(0));
+		doc.insert(position, atom);
 	}
 	
-	public void print() {
-		tree.printString();
+	public void delete(int position) { 
+		doc.delete(position);
+	}
+	
+	public void remoteInsert(int index, String text) {
+		controller.remoteInsert(index, text);
+	}
+	
+	public void remoteDelete(int index) {
+		controller.remoteDelete(index);
+	}
+	
+	public void test() {
+		System.out.println(doc.getTreeString());
+//		doc.remoteInsertTest();
+//		doc.remoteDeleteTest();
+	}
+	
+	public void addListener(AppController controller) {
+		this.controller = controller;
 	}
 }
