@@ -1,8 +1,10 @@
 package crdt;
 
+import java.io.Serializable;
+import java.util.Objects;
 import java.util.UUID;
 
-public class Position {
+public class Position implements Serializable {
 	public static final String LEFT_NODE = "0";
 	public static final String RIGHT_NODE = "1";
 	public static final String EMPTY_PATH = "";
@@ -119,5 +121,21 @@ public class Position {
 		}
 		
 		return count;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		Position position = (Position) o;
+		return Objects.equals(getPath(), position.getPath()) &&
+				Objects.equals(getNode(), position.getNode()) &&
+				Objects.equals(udis, position.udis);
+	}
+
+	@Override
+	public int hashCode() {
+
+		return Objects.hash(getPath(), getNode(), udis);
 	}
 }

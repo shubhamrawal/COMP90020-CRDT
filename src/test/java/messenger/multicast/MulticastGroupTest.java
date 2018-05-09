@@ -2,6 +2,7 @@ package messenger.multicast;
 
 import crdt.Operation;
 import messenger.CRDTMessage;
+import messenger.TestUtil;
 import messenger.message.Callback;
 import messenger.message.Message;
 import org.junit.Test;
@@ -17,7 +18,7 @@ public class MulticastGroupTest {
     public void SentMessageIsReceived() {
         MulticastGroup<Message> group = new MulticastGroup<Message>("224.224.224.2", 9999);
         UUID uuid = UUID.fromString("067e6162-3b6f-4ae2-a171-2470b63dff00");
-        Operation op = new Operation();
+        Operation op = TestUtil.createOperation();
         Message message = new CRDTMessage(uuid, op);
         Callback<Message> callback = mock(Callback.class);
 

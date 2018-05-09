@@ -2,6 +2,7 @@ package messenger.ordering;
 
 import crdt.Operation;
 import messenger.CRDTMessage;
+import messenger.TestUtil;
 import messenger.message.Callback;
 import messenger.message.Group;
 import messenger.message.Message;
@@ -22,7 +23,7 @@ public class OrderedGroupTest {
         Group<OrderedMessage<Message>> groupMock = mock(Group.class);
         OrderedGroup<Message> orderedGroup = new OrderedGroup<Message>(groupMock);
         UUID uuid = UUID.fromString("067e6162-3b6f-4ae2-a171-2470b63dff00");
-        Operation op = new Operation();
+        Operation op = TestUtil.createOperation();
         Message message = new CRDTMessage(uuid, op);
         Callback<Message> callback = mock(Callback.class);
 

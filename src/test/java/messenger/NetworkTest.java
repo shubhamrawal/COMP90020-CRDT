@@ -16,7 +16,7 @@ public class NetworkTest {
         CRDTGroup processB = Network.getInstance().create("224.224.224.2", 9998);
         CRDTCallback callback = mock(CRDTCallback.class);
         UUID uuid = UUID.fromString("067e6162-3b6f-4ae2-a171-2470b63dff00");
-        Operation operation = new Operation();
+        Operation operation = TestUtil.createOperation();
         CRDTMessage crdtMessage = new CRDTMessage(uuid, operation);
 
         processB.onReceipt(callback);
@@ -32,7 +32,7 @@ public class NetworkTest {
     public void ASendsAndReceivesOwnMessage() {
         CRDTGroup processA = Network.getInstance().create("224.224.224.2", 9997);
         UUID uuid = UUID.fromString("067e6162-3b6f-4ae2-a171-2470b63dff00");
-        Operation operation = new Operation();
+        Operation operation = TestUtil.createOperation();
         CRDTMessage crdtMessage = new CRDTMessage(uuid, operation);
         CRDTCallback crdtCallback = mock(CRDTCallback.class);
 
