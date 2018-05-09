@@ -7,8 +7,6 @@ import messenger.message.Callback;
 import messenger.message.Message;
 import org.junit.Test;
 
-import java.util.UUID;
-
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
@@ -17,9 +15,8 @@ public class MulticastGroupTest {
     @Test
     public void SentMessageIsReceived() {
         MulticastGroup<Message> group = new MulticastGroup<Message>("224.224.224.2", 9999);
-        UUID uuid = UUID.fromString("067e6162-3b6f-4ae2-a171-2470b63dff00");
         Operation op = TestUtil.createOperation();
-        Message message = new CRDTMessage(uuid, op);
+        Message message = new CRDTMessage(op);
         Callback<Message> callback = mock(Callback.class);
 
         group.onReceipt(callback);
