@@ -5,15 +5,18 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 
+import messenger.CRDTMessage;
+import messenger.message.Message;
+
 public class MulticastSender {
 	private DatagramSocket socket;
     private InetAddress group;
     private byte[] buf;
     
-    public void multicast(String multicastMessage) throws IOException {
+    public void multicast(CRDTMessage multicastMessage) throws IOException {
 	        socket = new DatagramSocket();
 	        group = InetAddress.getByName("239.250.250.250");
-	        buf = multicastMessage.getBytes();
+	        buf = Message.serialize(multicastMessage);
 	 
 	        DatagramPacket packet 
 	          = new DatagramPacket(buf, buf.length, group, 4446);

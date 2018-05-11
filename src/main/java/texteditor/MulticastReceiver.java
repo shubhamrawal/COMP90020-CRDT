@@ -5,9 +5,12 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 
+import messenger.CRDTMessage;
+import messenger.message.Message;
+
 public class MulticastReceiver implements Runnable {
 	protected MulticastSocket socket = null;
-    protected byte[] buf = new byte[256];
+    protected byte[] buf = new byte[1024];
  
     public void run() {
     		try {
@@ -17,10 +20,10 @@ public class MulticastReceiver implements Runnable {
     	        while (true) {
     	            DatagramPacket packet = new DatagramPacket(buf, buf.length);
     	            socket.receive(packet);
-    	            String received = new String(packet.getData(), 0, packet.getLength());
-    	            System.out.println(received);
-    	            if ("end".equals(received)) {
-    	                break;
+    	            CRDTMessage message = (CRDTMessage)Message.deserialize(packet.getData());
+    	            System.out.println(message.getOperation().getAtom().toString());
+    	            if(message.getOperation().getAtom().toString().equals("end")) {
+    	            		break;
     	            }
     	        }
     	        socket.leaveGroup(group);

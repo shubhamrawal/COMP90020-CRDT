@@ -27,6 +27,9 @@ public class TreeReplicatedDocument extends ReplicatedDocument {
 	public TreeReplicatedDocument() {
 		callback.addListener(this);
 		group = Network.getInstance().create(MULTICAST_ADDRESS, MULTICAST_PORT);
+		group.onReceipt(callback);
+		System.out.println(callback);
+		group.join();
 	}
 
 	@Override
@@ -78,7 +81,7 @@ public class TreeReplicatedDocument extends ReplicatedDocument {
 		}
 		if(!added) {
 			insertList.add(posId);
-			index++;
+//			index++;
 		}
 		tree.add(new MiniNode(posId, newAtom));
 		model.remoteInsert(index, text);
