@@ -19,10 +19,11 @@ public class AppController {
 	@FXML
 	private Label fileName;
 	@FXML
-	private Label wordCount;
+	private Label charCount;
 	
 	private TextFile textFile;
 	private AppModel model;
+	private int count = 0;
 	
 	public AppController(AppModel model) {
 		this.model = model;
@@ -100,11 +101,15 @@ public class AppController {
 		if(code.equals(KeyCode.BACK_SPACE)) {
 			if(position != 0) {
 				model.delete(position);
+				count--;
+				charCount.setText("Character Count: " + count);
 			}
 		} else if(!code.isArrowKey() && !code.isFunctionKey() && !code.isMediaKey() 
 				&& !code.isModifierKey() && !code.isNavigationKey() 
 				&& !code.equals(KeyCode.CAPS)) {
 			model.insert(e.getText(), position);
+			count++;
+			charCount.setText("Character Count: " + count);
 		}
 	}
 	

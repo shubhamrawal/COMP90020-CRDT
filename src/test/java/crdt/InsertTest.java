@@ -17,6 +17,8 @@ public class InsertTest {
 		
 		String expected = first + second + third;
 		String actual = doc.getTreeString();
+//		System.out.print(expected);
+//		System.out.println(actual);
 		Assert.assertArrayEquals(expected.toCharArray(), actual.toCharArray());
 	}
 	

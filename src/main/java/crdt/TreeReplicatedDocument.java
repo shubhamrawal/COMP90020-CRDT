@@ -5,10 +5,15 @@ import java.util.List;
 import java.util.UUID;
 
 import messenger.CRDTCallback;
+import messenger.CRDTGroup;
+import messenger.CRDTMessage;
+import messenger.Network;
 import texteditor.AppModel;
 
 public class TreeReplicatedDocument extends ReplicatedDocument {
 	public static final boolean IS_INSERT = true;
+	private static final String MULTICAST_ADDRESS = "224.224.224.2";
+	private static final int MULTICAST_PORT = 9999;
 	
 	private BinaryTree tree = new BinaryTree();
 	// make the lists synchronized
@@ -17,9 +22,11 @@ public class TreeReplicatedDocument extends ReplicatedDocument {
 	private UUID udis = UUID.randomUUID();
 	private CRDTCallback callback = new CRDTCallback();
 	private AppModel model;
+	private CRDTGroup group;
 	
 	public TreeReplicatedDocument() {
 		callback.addListener(this);
+		group = Network.getInstance().create(MULTICAST_ADDRESS, MULTICAST_PORT);
 	}
 
 	@Override
@@ -41,6 +48,7 @@ public class TreeReplicatedDocument extends ReplicatedDocument {
 		Position posId = generatePosId(x, y);
 		insertList.add(insertPosition, posId);
 		tree.add(new MiniNode(posId, newAtom));
+		group.send(new CRDTMessage(udis, new Operation(OperationType.INSERT, posId, newAtom)));
 	}
 	
 	@Override
@@ -49,6 +57,7 @@ public class TreeReplicatedDocument extends ReplicatedDocument {
 		Position posId = insertList.get(deletePosition);
 		deleteList.add(posId);
 		tree.delete(posId);
+		group.send(new CRDTMessage(udis, new Operation(OperationType.DELETE, posId, null)));
 	}
 
 	@Override
