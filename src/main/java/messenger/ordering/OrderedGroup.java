@@ -1,13 +1,14 @@
 package messenger.ordering;
 
+import crdt.OperationType;
+import messenger.CRDTMessage;
 import messenger.message.Callback;
 import messenger.message.Group;
-import messenger.message.Message;
 import texteditor.App;
 
 import java.util.logging.Logger;
 
-public class OrderedGroup<M extends Message> implements Group<M> {
+public class OrderedGroup<M extends CRDTMessage> implements Group<M> {
 
     private static final Logger LOGGER = Logger.getLogger(Thread.currentThread().getStackTrace()[0].getClassName() );
     private Group<OrderedMessage<M>> messageGroup;
@@ -32,8 +33,10 @@ public class OrderedGroup<M extends Message> implements Group<M> {
     synchronized void receive(OrderedMessage<M> message, Callback<M> callback) {
         // first, compare local timestamp with timestamp of received message
         int order = timestamp.compareTo(message.getTimestamp(), message.getSenderId());
-        if (order == 0) {
+        if (order == 0 ||
+                (order == -1 && message.getInnerMessage().getOperation().getType().equals(OperationType.INSERT))) {
             // if received timestamp is expected deliver the message
+            // or the message is a future insert operation, deliver it
             timestamp.merge(message.getTimestamp());
             if (callback != null) {
                 callback.process(message.getInnerMessage());

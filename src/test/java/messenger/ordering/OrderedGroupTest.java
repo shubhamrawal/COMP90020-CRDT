@@ -1,11 +1,11 @@
 package messenger.ordering;
 
 import crdt.Operation;
+import crdt.OperationType;
 import messenger.CRDTMessage;
 import messenger.TestUtil;
 import messenger.message.Callback;
 import messenger.message.Group;
-import messenger.message.Message;
 import org.junit.Test;
 import texteditor.App;
 
@@ -20,11 +20,11 @@ public class OrderedGroupTest {
 
     @Test
     public void sentMessageIsForwarded() {
-        Group<OrderedMessage<Message>> groupMock = mock(Group.class);
-        OrderedGroup<Message> orderedGroup = new OrderedGroup<Message>(groupMock);
+        Group<OrderedMessage<CRDTMessage>> groupMock = mock(Group.class);
+        OrderedGroup<CRDTMessage> orderedGroup = new OrderedGroup<CRDTMessage>(groupMock);
         Operation op = TestUtil.createOperation();
-        Message message = new CRDTMessage(op);
-        Callback<Message> callback = mock(Callback.class);
+        CRDTMessage message = new CRDTMessage(op);
+        Callback<CRDTMessage> callback = mock(Callback.class);
 
         orderedGroup.onReceipt(callback);
         orderedGroup.join();
@@ -38,13 +38,13 @@ public class OrderedGroupTest {
 
     @Test
     public void pastMessageIsIgnored() {
-        Group<OrderedMessage<Message>> groupMock = mock(Group.class);
-        OrderedGroup<Message> orderedGroup = new OrderedGroup<Message>(groupMock);
-        Message sentMessage = mock(Message.class);
-        Callback<Message> callback = mock(Callback.class);
+        Group<OrderedMessage<CRDTMessage>> groupMock = mock(Group.class);
+        OrderedGroup<CRDTMessage> orderedGroup = new OrderedGroup<CRDTMessage>(groupMock);
+        CRDTMessage sentMessage = mock(CRDTMessage.class);
+        Callback<CRDTMessage> callback = mock(Callback.class);
 
         //received stuff
-        Message innerMessage = mock(Message.class);
+        CRDTMessage innerMessage = mock(CRDTMessage.class);
         HashMap<UUID, Integer> logicalClocks = new HashMap<>();
         logicalClocks.put(App.uuid, 1);
         OrderedMessage receivedMessage = new OrderedMessage(App.uuid, new VectorTimestamp(logicalClocks), innerMessage);
@@ -64,13 +64,13 @@ public class OrderedGroupTest {
 
     @Test
     public void expectedMessageIsDeliveredImmediately() {
-        Group<OrderedMessage<Message>> groupMock = mock(Group.class);
-        OrderedGroup<Message> orderedGroup = new OrderedGroup<Message>(groupMock);
-        Message sentMessage = mock(Message.class);
-        Callback<Message> callback = mock(Callback.class);
+        Group<OrderedMessage<CRDTMessage>> groupMock = mock(Group.class);
+        OrderedGroup<CRDTMessage> orderedGroup = new OrderedGroup<CRDTMessage>(groupMock);
+        CRDTMessage sentMessage = mock(CRDTMessage.class);
+        Callback<CRDTMessage> callback = mock(Callback.class);
 
         //received stuff
-        Message innerMessage = mock(Message.class);
+        CRDTMessage innerMessage = mock(CRDTMessage.class);
         HashMap<UUID, Integer> logicalClocks = new HashMap<>();
         logicalClocks.put(App.uuid, 3);
         OrderedMessage receivedMessage = new OrderedMessage(App.uuid, new VectorTimestamp(logicalClocks), innerMessage);
@@ -90,13 +90,13 @@ public class OrderedGroupTest {
 
     @Test
     public void firstMessageFromUnknownProcessIsDeliveredImmediately() {
-        Group<OrderedMessage<Message>> groupMock = mock(Group.class);
-        OrderedGroup<Message> orderedGroup = new OrderedGroup<Message>(groupMock);
-        Message sentMessage = mock(Message.class);
-        Callback<Message> callback = mock(Callback.class);
+        Group<OrderedMessage<CRDTMessage>> groupMock = mock(Group.class);
+        OrderedGroup<CRDTMessage> orderedGroup = new OrderedGroup<CRDTMessage>(groupMock);
+        CRDTMessage sentMessage = mock(CRDTMessage.class);
+        Callback<CRDTMessage> callback = mock(Callback.class);
 
         //received stuff
-        Message innerMessage = mock(Message.class);
+        CRDTMessage innerMessage = mock(CRDTMessage.class);
         HashMap<UUID, Integer> logicalClocks = new HashMap<>();
         logicalClocks.put(App.uuid, 1);
         UUID senderId = UUID.randomUUID();
@@ -118,13 +118,15 @@ public class OrderedGroupTest {
 
     @Test
     public void futureMessageIsBufferedAndDeliveredInOrder() {
-        Group<OrderedMessage<Message>> groupMock = mock(Group.class);
-        OrderedGroup<Message> orderedGroup = new OrderedGroup<Message>(groupMock);
-        Message sentMessage = mock(Message.class);
-        Callback<Message> callback = mock(Callback.class);
+        Group<OrderedMessage<CRDTMessage>> groupMock = mock(Group.class);
+        OrderedGroup<CRDTMessage> orderedGroup = new OrderedGroup<CRDTMessage>(groupMock);
+        CRDTMessage sentMessage = mock(CRDTMessage.class);
+        Callback<CRDTMessage> callback = mock(Callback.class);
 
         // received stuff
-        Message innerMessage = mock(Message.class);
+        CRDTMessage innerMessage = mock(CRDTMessage.class, RETURNS_DEEP_STUBS);
+        // only deletions are buffered
+        when(innerMessage.getOperation().getType()).thenReturn(OperationType.DELETE);
         HashMap<UUID, Integer> logicalClocks = new HashMap<>();
         logicalClocks.put(App.uuid, 4);
         OrderedMessage receivedMessage = new OrderedMessage(App.uuid, new VectorTimestamp(logicalClocks), innerMessage);
