@@ -10,6 +10,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.stage.FileChooser;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Arrays;
 
@@ -96,6 +97,13 @@ public class AppController {
 	
 	@FXML
 	private synchronized void onKeyPressed(KeyEvent e) {
+		MulticastSender sender = new MulticastSender();
+		try {
+			sender.multicast("hello world");
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		KeyCode code = e.getCode();
 		int position = textArea.caretPositionProperty().intValue();
 		if(code.equals(KeyCode.BACK_SPACE)) {

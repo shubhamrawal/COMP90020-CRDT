@@ -12,8 +12,8 @@ import java.util.UUID;
 
 public class TreeReplicatedDocument extends ReplicatedDocument {
 	public static final boolean IS_INSERT = true;
-	private static final String MULTICAST_ADDRESS = "224.224.224.2";
-	private static final int MULTICAST_PORT = 9999;
+	private static final String MULTICAST_ADDRESS = "239.250.250.250";
+	private static final int MULTICAST_PORT = 64321;
 	
 	private BinaryTree tree = new BinaryTree();
 	// make the lists synchronized

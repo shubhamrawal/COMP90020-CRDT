@@ -11,6 +11,7 @@ public class CRDTCallback implements Callback<CRDTMessage> {
 	}
 
     public void process(CRDTMessage crdtMessage) {
+    		System.out.println("received");
         merge(crdtMessage.getOperation());
     }
 
