@@ -22,21 +22,10 @@ public class DeleteTest {
 	}
 	
 	@Test
-	public void DeleteNonExistingString() {
-		String first = "hello world";
-		deleteStringFromTree(first, 0);
-		insertStringIntoTree(first, 0);
-		
-		String expected = first;
-		String actual = doc.getTreeString();
-		Assert.assertArrayEquals(expected.toCharArray(), actual.toCharArray());
-	}
-	
-	@Test
 	public void ConsecutiveInsertsAndDeletes() {
 		String first = "this is a line";
 		String second = "hello world";
-		for(int i = 0; i < 100; i++) {
+		for(int i = 0; i < 10; i++) {
 			insertStringIntoTree(first, 0);
 			deleteStringFromTree(first, 0);
 		}
@@ -56,11 +45,10 @@ public class DeleteTest {
 	}
 	
 	private void deleteStringFromTree(String str, int offset) {
-		int position = str.length() -1 + offset;
+		int position = str.length() + offset;
 		for(int i = 0; i < str.length(); i++) {
 			doc.delete(position);
 			position--;
 		}
 	}
-
 }

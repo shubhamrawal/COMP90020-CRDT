@@ -24,11 +24,11 @@ public class Position implements Serializable {
 		String a = this.path + this.node;
 		String b = x.getPath() + x.getNode();
 		if(a.length() < b.length() && b.startsWith(a) && 
-				String.valueOf(b.charAt(a.length())) == RIGHT_NODE) {
+				String.valueOf(b.charAt(a.length())).equals(RIGHT_NODE)) {
 			return true;
 		}
 		if(b.length() < a.length() && a.startsWith(b) && 
-				String.valueOf(a.charAt(b.length())) == LEFT_NODE) {
+				String.valueOf(a.charAt(b.length())).equals(LEFT_NODE)) {
 			return true;
 		}
 		int index = commonPrefix(a, b);

@@ -26,7 +26,9 @@ public class CRDTCallback implements Callback<CRDTMessage> {
     		switch(type) {
     			case INSERT:
     				Atom value = operation.getAtom();
-    				doc.remoteInsert(posId, value);
+    				if(value != null) {
+    					doc.remoteInsert(posId, value);
+    				}
     				break;
     			case DELETE:
     				doc.remoteDelete(posId);
