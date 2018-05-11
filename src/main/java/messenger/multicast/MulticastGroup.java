@@ -70,6 +70,7 @@ public class MulticastGroup<M extends Message> implements Group<M> {
     private void sendMulticast(byte[] multicastData) throws IOException {
         InetAddress group = InetAddress.getByName(this.multicastHost);
         try(MulticastSocket socket = new MulticastSocket()){
+            socket.setTimeToLive(5);
             socket.send(new DatagramPacket(multicastData, multicastData.length, group, this.multicastPort));
         }
     }
