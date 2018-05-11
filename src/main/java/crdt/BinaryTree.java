@@ -31,6 +31,34 @@ public class BinaryTree {
 		string(root);
 	}
 	
+	public Position getPosition(int position) {
+		if(position < 0) return null;
+		return position(root, position);
+	}
+	
+	private Position position(Node current, int index) {
+		if(current == null) {
+			return null;
+		}
+		Position result = null;
+		if(current.getLeft() != null) {
+			result = position(current.getLeft(), index);
+		}
+		if(result == null) {
+			for(MiniNode miniNode: current.getMiniNodes()) {
+				if(!miniNode.isTombstone()) {
+					index--;
+				}
+			}
+			if(index == 0) return current.getNodeId();
+		}
+		if(result == null && current.getRight() != null) {
+			result = position(current.getRight(), index);
+		}
+		
+		return result;
+	}
+	
 	private Node getNodeWithPosId(Node current, Position posId) {
 		if(current == null) {
 			return null;

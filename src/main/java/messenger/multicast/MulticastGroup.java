@@ -77,8 +77,6 @@ public class MulticastGroup<M extends Message> implements Group<M> {
         try {
             M message = (M) Message.deserialize(data);
             if (callback != null) {
-            		System.out.println("received");
-            		System.out.println(callback);
                 callback.process(message);
             } else {
                 LOGGER.info("No callback attached -> message ignored");
@@ -99,7 +97,6 @@ public class MulticastGroup<M extends Message> implements Group<M> {
         receiveMulticastSocket = new MulticastSocket(multicastPort);
         receiveMulticastSocket.joinGroup(receiveInetAddress);
         future = service.submit(() -> {
-        		System.out.print("running\n");
             byte[] buf = new byte[2048];
             while (true) {
                 DatagramPacket msgPacket = new DatagramPacket(buf, buf.length);

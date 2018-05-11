@@ -17,8 +17,8 @@ public class TreeReplicatedDocument extends ReplicatedDocument {
 	
 	private BinaryTree tree = new BinaryTree();
 	// make the lists synchronized
-	private List<Position> insertList = new LinkedList<Position>();
-	private List<Position> deleteList = new LinkedList<Position>();
+//	private List<Position> insertList = new LinkedList<Position>();
+//	private List<Position> deleteList = new LinkedList<Position>();
 	private UUID udis = UUID.randomUUID();
 	private CRDTCallback callback = new CRDTCallback();
 	private AppModel model;
@@ -28,80 +28,83 @@ public class TreeReplicatedDocument extends ReplicatedDocument {
 		callback.addListener(this);
 		group = Network.getInstance().create(MULTICAST_ADDRESS, MULTICAST_PORT);
 		group.onReceipt(callback);
-		System.out.println(callback);
+//		System.out.println(callback);
 		group.join();
 	}
 
 	@Override
 	public synchronized void insert(int position, Atom newAtom) {
-		int insertPosition = findPosition(IS_INSERT, position);
-		int size = insertList.size();
-		Position x = null, y = null;
-		if(insertPosition == 0) {
-			if(size != 0) {
-				y = insertList.get(0);
-			}
-		} else if(insertPosition == size) {
-			x = insertList.get(size-1);
-		} else {
-			x = insertList.get(insertPosition-1);
-			y = insertList.get(insertPosition);
-		}
+//		int insertPosition = findPosition(IS_INSERT, position);
+//		Position[] positions = tree.getPositions();
+		
+//		int size = insertList.size();
+//		Position x = null, y = null;
+//		if(insertPosition == 0) {
+//			if(size != 0) {
+//				y = insertList.get(0);
+//			}
+//		} else if(insertPosition == size) {
+//			x = insertList.get(size-1);
+//		} else {
+//			x = insertList.get(insertPosition-1);
+//			y = insertList.get(insertPosition);
+//		}
 
-		Position posId = generatePosId(x, y);
-		insertList.add(insertPosition, posId);
+		Position posId = generatePosId(tree.getPosition(position), tree.getPosition(position+1));
+		System.out.println(posId.getFullPath());
+//		insertList.add(insertPosition, posId);
 		tree.add(new MiniNode(posId, newAtom));
 		group.send(new CRDTMessage(new Operation(OperationType.INSERT, posId, newAtom)));
 	}
 	
 	@Override
 	public synchronized void delete(int position) {
-		int deletePosition = findPosition(!IS_INSERT, position);
-		Position posId = insertList.get(deletePosition);
-		deleteList.add(posId);
-		tree.delete(posId);
-		group.send(new CRDTMessage(new Operation(OperationType.DELETE, posId, null)));
+//		int deletePosition = findPosition(!IS_INSERT, position);
+//		Position posId = insertList.get(deletePosition);
+//		deleteList.add(posId);
+//		tree.delete(posId);
+//		group.send(new CRDTMessage(new Operation(OperationType.DELETE, posId, null)));
 	}
 
 	@Override
 	public synchronized void remoteInsert(Position posId, Atom newAtom) {
-		boolean added = false;
-		int index = 0;
-		String text = newAtom.toString();
-		for(int i = 0; i < insertList.size(); i++) {
-			Position next = insertList.get(i);
-			if(posId.lessThan(next)) {
-				insertList.add(i, posId);
-				added = true;
-				break;
-			}
-			if(!deleteList.contains(next)) {
-				index++;
-			}
-		}
-		if(!added) {
-			insertList.add(posId);
-//			index++;
-		}
-		tree.add(new MiniNode(posId, newAtom));
-		model.remoteInsert(index, text);
+//		boolean added = false;
+//		int index = 0;
+//		String text = newAtom.toString();
+//		for(int i = 0; i < insertList.size(); i++) {
+//			Position next = insertList.get(i);
+//			if(posId.lessThan(next)) {
+//				insertList.add(i, posId);
+//				added = true;
+//				break;
+//			}
+//			if(!deleteList.contains(next)) {
+//				index++;
+//			}
+//		}
+//		if(!added) {
+//			insertList.add(posId);
+////			index++;
+//		}
+//		tree.add(new MiniNode(posId, newAtom));
+//		model.remoteInsert(index, text);
 	}
 
 	@Override
 	public synchronized void remoteDelete(Position posId) {
-		int index = 0;
-		for(int i = 0; i < insertList.size(); i++) {
-			Position next = insertList.get(i);
-			if(posId.equalTo(next)) {
-				deleteList.add(posId);
-				break;
-			}
-			if(!deleteList.contains(next)) {
-				index++;
-			}
-		}
-		tree.delete(posId);
-		model.remoteDelete(index);
+//		int index = 0;
+//		for(int i = 0; i < insertList.size(); i++) {
+//			Position next = insertList.get(i);
+//			if(posId.equalTo(next)) {
+//				deleteList.add(posId);
+//				break;
+//			}
+//			if(!deleteList.contains(next)) {
+//				index++;
+//			}
+//		}
+//		tree.delete(posId);
+//		model.remoteDelete(index);
 	}
 	
 	public String getTreeString() {
@@ -120,58 +123,58 @@ public class TreeReplicatedDocument extends ReplicatedDocument {
 	}
 	
 	// TODO remove
-	public void remoteInsertTest() {
-		String test = "hello world\n";
-		for(int i = 0; i < test.length(); i++) {
-			Position posId = getTestPositionId(i+2);
-			remoteInsert(posId, new Atom(test.charAt(i)));
-		}
-	}
+//	public void remoteInsertTest() {
+//		String test = "hello world\n";
+//		for(int i = 0; i < test.length(); i++) {
+//			Position posId = getTestPositionId(i+2);
+//			remoteInsert(posId, new Atom(test.charAt(i)));
+//		}
+//	}
 	
 	// TODO remove
 	public void remoteDeleteTest() {
-		for(int i = 10; i > 8; i--) {
-			int deletePosition = findPosition(!IS_INSERT, i);
-			System.out.println("position: " + deletePosition);
-			Position posId = insertList.get(deletePosition);
-			remoteDelete(posId);
-		}
+//		for(int i = 10; i > 8; i--) {
+//			int deletePosition = findPosition(!IS_INSERT, i);
+//			System.out.println("position: " + deletePosition);
+//			Position posId = insertList.get(deletePosition);
+//			remoteDelete(posId);
+//		}
 	}
 	
 	// TODO remove
-	public Position getTestPositionId(int position) {
-		int insertPosition = findPosition(IS_INSERT, position);
-		Position x = null, y = null;
-		if(insertPosition == 0) {
-			if(insertList.size() != 0) {
-				y = insertList.get(0);
-			}
-		} else if(insertPosition == insertList.size()) {
-			x = insertList.get(insertList.size()-1);
-		} else {
-			x = insertList.get(insertPosition-1);
-			y = insertList.get(insertPosition);
-		}
-		
-		return generatePosId(x, y);
-	}
+//	public Position getTestPositionId(int position) {
+//		int insertPosition = findPosition(IS_INSERT, position);
+//		Position x = null, y = null;
+//		if(insertPosition == 0) {
+//			if(insertList.size() != 0) {
+//				y = insertList.get(0);
+//			}
+//		} else if(insertPosition == insertList.size()) {
+//			x = insertList.get(insertList.size()-1);
+//		} else {
+//			x = insertList.get(insertPosition-1);
+//			y = insertList.get(insertPosition);
+//		}
+//		
+//		return generatePosId(x, y);
+//	}
 	
 	public void addListner(AppModel model) {
 		this.model = model;
 	}
 	
-	private int findPosition(boolean isInsert, int position) {
-		int count = 0;
-		for(int i = 0; i < insertList.size(); i++) {
-			if(!deleteList.contains(insertList.get(i))) {
-				count++;
-			}
-			if(count == ((isInsert) ? position+1 : position)) {
-				return i;
-			}
-		}
-		return insertList.size();
-	}
+//	private int findPosition(boolean isInsert, int position) {
+//		int count = 0;
+//		for(int i = 0; i < insertList.size(); i++) {
+//			if(!deleteList.contains(insertList.get(i))) {
+//				count++;
+//			}
+//			if(count == ((isInsert) ? position+1 : position)) {
+//				return i;
+//			}
+//		}
+//		return insertList.size();
+//	}
 	
 	private Position generatePosId(Position x, Position y) {
 		if(x == null && y == null) {
