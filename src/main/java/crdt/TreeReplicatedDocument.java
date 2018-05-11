@@ -27,6 +27,8 @@ public class TreeReplicatedDocument extends ReplicatedDocument {
 	public TreeReplicatedDocument() {
 		callback.addListener(this);
 		group = Network.getInstance().create(MULTICAST_ADDRESS, MULTICAST_PORT);
+		group.onReceipt(callback);
+		group.join();
 	}
 
 	@Override

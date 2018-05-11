@@ -60,6 +60,7 @@ public class MulticastGroup<M extends Message> implements Group<M> {
         if (receiveMulticastSocket != null && receiveInetAddress != null) {
             try {
                 receiveMulticastSocket.leaveGroup(receiveInetAddress);
+                receiveMulticastSocket.close();
             } catch (IOException e) {
                 LOGGER.warning("Could not leave group");
             }
