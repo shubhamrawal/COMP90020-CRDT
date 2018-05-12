@@ -1,13 +1,7 @@
 package messenger;
 
-import crdt.Atom;
-import crdt.Operation;
-import crdt.OperationType;
-import crdt.Position;
-import crdt.TreeReplicatedDocument;
+import crdt.*;
 import messenger.message.Callback;
-
-import java.util.UUID;
 
 public class CRDTCallback implements Callback<CRDTMessage> {
 	private TreeReplicatedDocument doc;
@@ -17,10 +11,10 @@ public class CRDTCallback implements Callback<CRDTMessage> {
 	}
 
     public void process(CRDTMessage crdtMessage) {
-        merge(crdtMessage.getSenderId(), crdtMessage.getOperation());
+        merge(crdtMessage.getOperation());
     }
 
-    private void merge(UUID senderId, Operation operation) {
+    private void merge(Operation operation) {
     		OperationType type = operation.getType();
     		Position posId = operation.getPosId();
     		switch(type) {

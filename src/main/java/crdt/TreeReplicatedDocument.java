@@ -1,14 +1,14 @@
 package crdt;
 
-import java.util.List;
-import java.util.UUID;
-
 import messenger.CRDTCallback;
 import messenger.CRDTGroup;
 import messenger.CRDTMessage;
 import messenger.Network;
 import texteditor.App;
 import texteditor.AppModel;
+
+import java.util.List;
+import java.util.UUID;
 
 public class TreeReplicatedDocument extends ReplicatedDocument {
 	public static final boolean IS_INSERT = true;
@@ -32,14 +32,14 @@ public class TreeReplicatedDocument extends ReplicatedDocument {
 	public synchronized void insert(int position, Atom newAtom) {
 		Position posId = generatePosId(tree.getPosition(position), tree.getPosition(position+1));
 		tree.add(new MiniNode(posId, newAtom));
-		group.send(new CRDTMessage(udis, new Operation(OperationType.INSERT, posId, newAtom)));
+		group.send(new CRDTMessage(new Operation(OperationType.INSERT, posId, newAtom)));
 	}
 	
 	@Override
 	public synchronized void delete(int position) {
 		Position posId = tree.getPosition(position);
 		tree.delete(posId);
-		group.send(new CRDTMessage(udis, new Operation(OperationType.DELETE, posId, null)));
+		group.send(new CRDTMessage(new Operation(OperationType.DELETE, posId, null)));
 	}
 
 	@Override
