@@ -46,6 +46,7 @@ public class MulticastGroup<M extends Message> implements Group<M> {
         try {
             receiveMulticast();
         } catch (IOException e) {
+        		e.printStackTrace();
             LOGGER.severe("Could not join group");
         }
     }

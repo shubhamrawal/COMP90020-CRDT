@@ -41,7 +41,6 @@
          <children>
             <Label fx:id="fileName" text="New File" />
             <Region prefHeight="40.0" prefWidth="20.0" />
-            <Label fx:id="charCount" text="Character Count: 0" />
          </children></HBox>
    </bottom>
    

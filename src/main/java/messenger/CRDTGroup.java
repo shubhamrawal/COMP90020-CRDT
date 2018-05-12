@@ -12,12 +12,10 @@ public class CRDTGroup implements Group<CRDTMessage> {
     }
 
     public void send(CRDTMessage message) {
-//    		System.out.println(message.getOperation().getAtom().toString());
         this.messageGroup.send(message);
     }
 
     public void onReceipt(Callback<CRDTMessage> crdtCallback) {
-    		System.out.println("received");
         this.messageGroup.onReceipt(crdtCallback);
     }
 
