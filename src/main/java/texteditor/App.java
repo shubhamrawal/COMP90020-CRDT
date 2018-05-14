@@ -21,6 +21,14 @@ public class App extends Application {
 		primaryStage.show();
 	}
 	
+	@Override
+	public void stop() throws Exception {
+		super.stop();
+		System.out.println("Application Closed");
+		// TODO close all running threads (Multicast)
+		System.exit(0);
+	}
+	
 	public static void main(String[] args) {
 		System.setProperty("java.net.preferIPv4Stack", "true");
 		launch(args);
