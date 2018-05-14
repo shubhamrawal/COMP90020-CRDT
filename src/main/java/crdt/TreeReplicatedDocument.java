@@ -12,7 +12,7 @@ import java.util.UUID;
 
 public class TreeReplicatedDocument extends ReplicatedDocument {
 	public static final boolean IS_INSERT = true;
-	private static final String MULTICAST_ADDRESS = "239.250.250.250";
+	private static final String MULTICAST_ADDRESS = "224.0.0.15";
 	private static final int MULTICAST_PORT = 9999;
 	
 	private BinaryTree tree = new BinaryTree();
@@ -31,6 +31,7 @@ public class TreeReplicatedDocument extends ReplicatedDocument {
 	@Override
 	public synchronized void insert(int position, Atom newAtom) {
 		Position posId = generatePosId(tree.getPosition(position), tree.getPosition(position+1));
+		System.out.println(posId.getFullPath());
 		tree.add(new MiniNode(posId, newAtom));
 		group.send(new CRDTMessage(new Operation(OperationType.INSERT, posId, newAtom)));
 	}
@@ -45,6 +46,7 @@ public class TreeReplicatedDocument extends ReplicatedDocument {
 	@Override
 	public synchronized void remoteInsert(Position posId, Atom newAtom) {
 		int index = tree.getIndex(posId);
+		System.out.println(index);
 		tree.add(new MiniNode(posId, newAtom));
 		model.remoteInsert(index, newAtom.toString());
 	}

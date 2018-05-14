@@ -1,5 +1,6 @@
 package texteditor;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -21,6 +22,7 @@ public class AppController {
 	
 	private TextFile textFile;
 	private AppModel model;
+	private int position;
 	
 	public AppController(AppModel model) {
 		this.model = model;
@@ -28,11 +30,17 @@ public class AppController {
 	}
 	
 	public void remoteInsert(int index, String text) {
-		textArea.insertText(index, text);
+		Platform.runLater(() -> {
+			textArea.insertText(index, text);
+			textArea.positionCaret(position);
+		});
 	}
 	
 	public void remoteDelete(int index) {
-		textArea.deleteText(index, index+1);
+		Platform.runLater(() -> {
+			textArea.deleteText(index, index+1);
+			textArea.positionCaret(position);
+		});
 	}
 	
 	@FXML
@@ -94,7 +102,7 @@ public class AppController {
 	@FXML
 	private synchronized void onKeyPressed(KeyEvent e) {
 		KeyCode code = e.getCode();
-		int position = textArea.caretPositionProperty().intValue();
+		position = textArea.caretPositionProperty().intValue();
 		if(code.equals(KeyCode.BACK_SPACE)) {
 			if(position != 0) {
 				model.delete(position);

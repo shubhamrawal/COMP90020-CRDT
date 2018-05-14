@@ -63,3 +63,4 @@ local.properties
 # exclude gradle files
 .gradle/*
 build/*
+/.gradle/
