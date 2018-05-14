@@ -15,7 +15,7 @@ public class NetworkTest {
         CRDTMessage crdtMessage = new CRDTMessage(operation);
         CRDTCallback callback = mock(CRDTCallback.class);
 
-        //note that the processes share the same uuid through App.uuid
+        //note that the processes share the same uuid through App.uuid but the recipient's local timestamp is empty
 
         processB.onReceipt(callback);
         processB.join();

@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
-import java.net.NetworkInterface;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -72,7 +71,7 @@ public class MulticastGroup<M extends Message> implements Group<M> {
     private void sendMulticast(byte[] multicastData) throws IOException {
         InetAddress group = InetAddress.getByName(this.multicastHost);
         try(MulticastSocket socket = new MulticastSocket()){
-            socket.setTimeToLive(5);
+            socket.setTimeToLive(10);
             socket.send(new DatagramPacket(multicastData, multicastData.length, group, this.multicastPort));
         }
     }
@@ -99,7 +98,7 @@ public class MulticastGroup<M extends Message> implements Group<M> {
         }
         receiveInetAddress = InetAddress.getByName(multicastHost);
         receiveMulticastSocket = new MulticastSocket(multicastPort);
-        receiveMulticastSocket.setNetworkInterface(NetworkInterface.getByName("en0"));
+        //receiveMulticastSocket.setNetworkInterface(NetworkInterface.getByName("wlan2"));
         receiveMulticastSocket.joinGroup(receiveInetAddress);
         future = service.submit(() -> {
             byte[] buf = new byte[2048];

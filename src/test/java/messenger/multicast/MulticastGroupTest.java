@@ -20,7 +20,7 @@ public class MulticastGroupTest {
 
     @Test
     public void SentMessageIsReceived() {
-        MulticastGroup<Message> group = new MulticastGroup<Message>("224.224.224.2", 9999);
+        MulticastGroup<Message> group = new MulticastGroup<Message>("224.0.0.15", 9999);
         Operation op = TestUtil.createOperation();
         Message message = new CRDTMessage(op);
         Callback<Message> callback = mock(Callback.class);
