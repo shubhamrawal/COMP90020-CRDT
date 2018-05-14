@@ -47,6 +47,7 @@ public class MulticastGroup<M extends Message> implements Group<M> {
         try {
             receiveMulticast();
         } catch (IOException e) {
+        		e.printStackTrace();
             LOGGER.severe("Could not join group");
         }
     }
@@ -98,7 +99,7 @@ public class MulticastGroup<M extends Message> implements Group<M> {
         }
         receiveInetAddress = InetAddress.getByName(multicastHost);
         receiveMulticastSocket = new MulticastSocket(multicastPort);
-        receiveMulticastSocket.setNetworkInterface(NetworkInterface.getByName("wlan2"));
+        receiveMulticastSocket.setNetworkInterface(NetworkInterface.getByName("en0"));
         receiveMulticastSocket.joinGroup(receiveInetAddress);
         future = service.submit(() -> {
             byte[] buf = new byte[2048];

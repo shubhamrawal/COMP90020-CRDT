@@ -7,6 +7,16 @@ public class BinaryTree {
 	Node root = null;
 	List<String> stringList;
 	
+	public class Result {
+		public Result(Position position, int index) {
+			this.position = position;
+			this.index = index;
+		}
+		
+		public Position position;
+		public int index;
+	}
+	
 	public void add(MiniNode node) {
 		root = addNode(root, node);
 	}
@@ -29,6 +39,59 @@ public class BinaryTree {
 	
 	public void printString() {
 		string(root);
+	}
+	
+	public Position getPosition(int position) {
+		return getPositionRec(root, new Result(null, position)).position;
+	}
+	
+	private Result getPositionRec(Node current, Result result) {
+		if(current == null) {
+			return result;
+		}
+		if(current.getLeft() != null) {
+			result = getPositionRec(current.getLeft(), result);
+		}
+		if(result.position == null) {
+			for(MiniNode miniNode: current.getMiniNodes()) {
+				if(!miniNode.isTombstone()) {
+					result.index--;
+				}
+			}
+			if(result.index == 0) {
+				result.position = current.getNodeId();
+				return result;
+			}
+		}
+		if(result.position == null && current.getRight() != null) {
+			result = getPositionRec(current.getRight(), result);
+		}
+		
+		return result;
+	}
+	
+	public int getIndex(Position posId) {
+		return getIndexRec(root, posId, 0);
+	}
+	
+	private int getIndexRec(Node current, Position posId, int index) {
+		if(current == null) {
+			return index;
+		}
+		if(current.getLeft() != null) {
+			index = getIndexRec(current.getLeft(), posId, index);
+		}
+		for(MiniNode miniNode: current.getMiniNodes()) {
+			if(posId.lessThan(miniNode.getPosId())) return index;
+			if(!miniNode.isTombstone()) {
+				index++;
+			}
+		}
+		if(current.getRight() != null) {
+			index = getIndexRec(current.getRight(), posId, index);
+		}
+		
+		return index;
 	}
 	
 	private Node getNodeWithPosId(Node current, Position posId) {
