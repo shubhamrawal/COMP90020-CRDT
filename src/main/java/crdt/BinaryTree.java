@@ -19,7 +19,7 @@ public class BinaryTree {
 		public OperationType type;
 	}
 	
-	public void add(MiniNode node) {
+	public synchronized void add(MiniNode node) {
 		root = addNode(root, node);
 	}
 	
@@ -43,7 +43,7 @@ public class BinaryTree {
 		string(root);
 	}
 	
-	public Position getPosition(int position, OperationType type) {
+	public synchronized Position getPosition(int position, OperationType type) {
 		return getPositionRec(root, new Result(null, position, type)).position;
 	}
 	
@@ -73,7 +73,7 @@ public class BinaryTree {
 		return result;
 	}
 	
-	public int getIndex(Position posId) {
+	public synchronized int getIndex(Position posId) {
 		return getIndexRec(root, posId, 0);
 	}
 	
@@ -87,10 +87,9 @@ public class BinaryTree {
 		for(MiniNode miniNode: current.getMiniNodes()) {
 			Position posMiniNode = miniNode.getPosId();
 			if(posId.lessThan(posMiniNode)) return index;
-			if(posId.equalToNodeId(posMiniNode)) {
-				if(posId.getUDIS().compareTo(posMiniNode.getUDIS()) == -1) 
+			if(posId.equalToNodeId(posMiniNode) && 
+					posId.getUDIS().compareTo(posMiniNode.getUDIS()) == -1) 
 					return index;
-			}
 			if(!miniNode.isTombstone()) {
 				index++;
 			}
