@@ -8,13 +8,15 @@ public class BinaryTree {
 	List<String> stringList;
 	
 	public class Result {
-		public Result(Position position, int index) {
+		public Result(Position position, int index, OperationType type) {
 			this.position = position;
 			this.index = index;
+			this.type = type;
 		}
 		
 		public Position position;
 		public int index;
+		public OperationType type;
 	}
 	
 	public void add(MiniNode node) {
@@ -41,8 +43,8 @@ public class BinaryTree {
 		string(root);
 	}
 	
-	public Position getPosition(int position) {
-		return getPositionRec(root, new Result(null, position)).position;
+	public Position getPosition(int position, OperationType type) {
+		return getPositionRec(root, new Result(null, position, type)).position;
 	}
 	
 	private Result getPositionRec(Node current, Result result) {
@@ -54,13 +56,14 @@ public class BinaryTree {
 		}
 		if(result.position == null) {
 			for(MiniNode miniNode: current.getMiniNodes()) {
-				if(!miniNode.isTombstone()) {
+				if(result.type == OperationType.INSERT || (result.type == OperationType.DELETE 
+						&& !miniNode.isTombstone())) {
 					result.index--;
+					if(result.index == 0) {
+						result.position = current.getNodeId();
+						return result;
+					}
 				}
-			}
-			if(result.index == 0) {
-				result.position = current.getNodeId();
-				return result;
 			}
 		}
 		if(result.position == null && current.getRight() != null) {
@@ -85,7 +88,8 @@ public class BinaryTree {
 			Position posMiniNode = miniNode.getPosId();
 			if(posId.lessThan(posMiniNode)) return index;
 			if(posId.equalToNodeId(posMiniNode)) {
-				if(posId.getUDIS().compareTo(posMiniNode.getUDIS()) == -1) return index;
+				if(posId.getUDIS().compareTo(posMiniNode.getUDIS()) == -1) 
+					return index;
 			}
 			if(!miniNode.isTombstone()) {
 				index++;

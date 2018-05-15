@@ -30,14 +30,15 @@ public class TreeReplicatedDocument extends ReplicatedDocument {
 
 	@Override
 	public synchronized void insert(int position, Atom newAtom) {
-		Position posId = generatePosId(tree.getPosition(position), tree.getPosition(position+1));
+		Position posId = generatePosId(tree.getPosition(position, OperationType.INSERT), 
+				tree.getPosition(position+1, OperationType.INSERT));
 		tree.add(new MiniNode(posId, newAtom));
 		group.send(new CRDTMessage(new Operation(OperationType.INSERT, posId, newAtom)));
 	}
 	
 	@Override
 	public synchronized void delete(int position) {
-		Position posId = tree.getPosition(position);
+		Position posId = tree.getPosition(position, OperationType.DELETE);
 		tree.delete(posId);
 		group.send(new CRDTMessage(new Operation(OperationType.DELETE, posId, null)));
 	}
