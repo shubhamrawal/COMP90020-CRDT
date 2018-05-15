@@ -14,7 +14,6 @@ public class Node {
 	}
 	
 	public Node addMiniNode(MiniNode node) {
-		// TODO change to account for udis
 		int index = 0;
 		for(MiniNode miniNode : nodes) {
 			if(node.getPosId().getUDIS().

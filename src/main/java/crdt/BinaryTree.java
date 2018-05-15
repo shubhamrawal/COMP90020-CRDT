@@ -88,7 +88,8 @@ public class BinaryTree {
 			Position posMiniNode = miniNode.getPosId();
 			if(posId.lessThan(posMiniNode)) return index;
 			if(posId.equalToNodeId(posMiniNode)) {
-				if(posId.getUDIS().compareTo(posMiniNode.getUDIS()) == -1) return index;
+				if(posId.getUDIS().compareTo(posMiniNode.getUDIS()) == -1) 
+					return index;
 			}
 			if(!miniNode.isTombstone()) {
 				index++;
