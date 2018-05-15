@@ -108,11 +108,13 @@ public class BinaryTree {
 		Position nodeId = current.getNodeId();
 		if(posId.equalToNodeId(nodeId)) {
 			return current;
-		} else if(posId.lessThan(nodeId)) {
+		} else if(current.getLeft() != null && posId.lessThan(nodeId)) {
 			return getNodeWithPosId(current.getLeft(), posId);
-		} else {
+		} else if(current.getRight() != null){
 			return getNodeWithPosId(current.getRight(), posId);
 		}
+		
+		return current;
 	}
 	
 	private Node addNode(Node current, MiniNode node) {
